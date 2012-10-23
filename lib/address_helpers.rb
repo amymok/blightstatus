@@ -72,8 +72,8 @@ module AddressHelpers
     streetname = strip_address_number(streetname)
     streetname = strip_address_unit(streetname)
     streetname = strip_direction(streetname)
-    
-    
+
+
     unless streetname.nil?
       @street_types.each do |(label, value)|
         if streetname.match(/\s#{label}$/)
@@ -99,7 +99,7 @@ module AddressHelpers
       # pair programming at it's best!
       # this is a weird mix of splits and regxp.
       return streetname.sub("-" + streetname.split(',')[0].split(' ')[0].split('-')[1], "")
-    end 
+    end
     return streetname
   end
 
@@ -138,7 +138,7 @@ module AddressHelpers
     streetname.upcase!
     @address_suffix.each do |value|
       if streetname.match(/\s#{value}$/)
-        return streetname.sub(/\s#{value}$/, '') 
+        return streetname.sub(/\s#{value}$/, '')
       end
     end
     return streetname
@@ -203,7 +203,7 @@ module AddressHelpers
     address = Address.where("house_num = ? and street_name = ?", "#{address_string.split(' ')[0]}", "#{address_street}")
     return address if !address.empty?
 
-    puts "----NOT FOUND------. Original address: #{orig_address}            Processed address: #{address_string}"
+    Rails.logger.debug "----NOT FOUND------. Original address: #{orig_address}            Processed address: #{address_string}"
     []
   end
 
