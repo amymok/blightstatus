@@ -1,4 +1,4 @@
-class Case < ActiveRecord::Base
+  class Case < ActiveRecord::Base
   after_save :update_address_status
 
   belongs_to :address
@@ -20,14 +20,24 @@ class Case < ActiveRecord::Base
   validates_uniqueness_of :case_number
 
   def first_inspection
-    self.inspections.sort{ |a, b| a.date <=> b.date }.first
+    self.ordered_inspections.first
   end
 
+  def last_inspection
+    self.ordered_inspections.last
+  end
+
+  def last_hearing
+    self.ordered_hearings.last
+  end
 
   def ordered_hearings
     self.hearings.sort{ |a, b| b.date <=> a.date }
   end
 
+  def ordered_inspections
+    self.inspections.sort{ |a, b| b.date <=> a.date }
+  end
 
   def ordered_case_steps
     case_steps = []
@@ -43,8 +53,6 @@ class Case < ActiveRecord::Base
 
   end
 
-
-
   def accela_steps
     steps_ary = []
     steps_ary << self.hearings << self.inspections << self.demolitions << self.resets << self.foreclosure << self.notifications << self.maintenances << self.judgement
@@ -53,6 +61,10 @@ class Case < ActiveRecord::Base
 
   def first_status
     self.accela_steps.sort{ |a, b| a.date <=> b.date }.first
+  end
+
+  def last_status
+    self.ordered_case_steps.last
   end
 
   def status

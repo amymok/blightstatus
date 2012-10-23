@@ -44,14 +44,14 @@ ActiveRecord::Schema.define(:version => 20121017012147) do
     t.float    "x"
     t.float    "y"
     t.string   "status"
-    t.datetime "created_at",                                                :null => false
-    t.datetime "updated_at",                                                :null => false
-    t.spatial  "point",            :limit => {:srid=>0, :type=>"geometry"}
+    t.datetime "created_at",                                                 :null => false
+    t.datetime "updated_at",                                                 :null => false
     t.string   "parcel_id"
     t.boolean  "official"
     t.string   "street_full_name"
     t.string   "assessor_url"
     t.integer  "neighborhood_id"
+    t.spatial  "point",            :limit => {:srid=>-1, :type=>"geometry"}
     t.string   "latest_type"
     t.integer  "latest_id"
     t.integer  "double_id"
@@ -91,9 +91,9 @@ ActiveRecord::Schema.define(:version => 20121017012147) do
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
     t.integer  "address_id"
+    t.string   "state"
     t.integer  "status_id"
     t.string   "status_type"
-    t.string   "state"
     t.string   "outcome"
   end
 
@@ -107,6 +107,7 @@ ActiveRecord::Schema.define(:version => 20121017012147) do
     t.string   "notes"
     t.datetime "created_at",    :null => false
     t.datetime "updated_at",    :null => false
+    t.integer  "spawn_id"
   end
 
   create_table "delayed_jobs", :force => true do |t|
@@ -188,6 +189,7 @@ ActiveRecord::Schema.define(:version => 20121017012147) do
     t.datetime "updated_at",         :null => false
     t.string   "hearing_type"
     t.boolean  "is_complete"
+    t.integer  "spawn_id"
   end
 
   add_index "hearings", ["case_number"], :name => "index_hearings_on_case_number"
@@ -210,6 +212,7 @@ ActiveRecord::Schema.define(:version => 20121017012147) do
     t.datetime "created_at",      :null => false
     t.datetime "updated_at",      :null => false
     t.text     "notes"
+    t.integer  "spawn_id"
   end
 
   add_index "inspections", ["case_number"], :name => "index_inspections_on_case_number"
@@ -227,6 +230,7 @@ ActiveRecord::Schema.define(:version => 20121017012147) do
     t.string   "status"
     t.string   "notes"
     t.datetime "judgement_date"
+    t.integer  "spawn_id"
   end
 
   add_index "judgements", ["case_number"], :name => "index_judgements_on_case_number"
@@ -257,9 +261,9 @@ ActiveRecord::Schema.define(:version => 20121017012147) do
     t.float    "x_max"
     t.float    "y_max"
     t.float    "area"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-    t.text     "the_geom"
+    t.datetime "created_at",                                           :null => false
+    t.datetime "updated_at",                                           :null => false
+    t.spatial  "the_geom",   :limit => {:srid=>-1, :type=>"geometry"}
   end
 
   create_table "notifications", :force => true do |t|
@@ -268,6 +272,7 @@ ActiveRecord::Schema.define(:version => 20121017012147) do
     t.string   "case_number"
     t.date     "notified"
     t.string   "notification_type"
+    t.integer  "spawn_id"
   end
 
   create_table "parcels", :force => true do |t|
@@ -289,6 +294,7 @@ ActiveRecord::Schema.define(:version => 20121017012147) do
     t.datetime "updated_at",  :null => false
     t.datetime "reset_date"
     t.string   "notes"
+    t.integer  "spawn_id"
   end
 
   add_index "resets", ["case_number"], :name => "index_resets_on_case_number"
@@ -309,21 +315,21 @@ ActiveRecord::Schema.define(:version => 20121017012147) do
     t.string   "full_name"
     t.integer  "length_numberic"
     t.integer  "shape_len"
-    t.datetime "created_at",                                                :null => false
-    t.datetime "updated_at",                                                :null => false
-    t.spatial  "the_geom",         :limit => {:srid=>0, :type=>"geometry"}
+    t.datetime "created_at",                                                 :null => false
+    t.datetime "updated_at",                                                 :null => false
     t.string   "prefix_direction"
     t.string   "suffix_direction"
+    t.spatial  "the_geom",         :limit => {:srid=>-1, :type=>"geometry"}
   end
 
   create_table "subscriptions", :force => true do |t|
     t.integer  "address_id"
     t.integer  "account_id"
     t.string   "notes"
-    t.datetime "created_at",    :null => false
-    t.datetime "updated_at",    :null => false
-    t.text     "thegeom"
+    t.datetime "created_at",                                              :null => false
+    t.datetime "updated_at",                                              :null => false
     t.datetime "date_notified"
+    t.spatial  "thegeom",       :limit => {:srid=>-1, :type=>"geometry"}
   end
 
 end
