@@ -124,6 +124,7 @@ describe Case do
       result.count.should == 0
     end
   end
+
   describe "#at_inspection2" do
     it "returns # of cases at inspection, should be 1" do
       result = Case.at_inspection
@@ -223,5 +224,29 @@ describe Case do
   end
 
   describe "#update_address_status" do
+  end
+
+  describe "::missing" do
+    it "returns new Case objects for Judgement, Hearing, Inspection, Notification, Complaint" do
+      FactoryGirl.create(:judgement,    :case_number => "1")
+      FactoryGirl.create(:hearing,      :case_number => "2")
+      FactoryGirl.create(:inspection,   :case_number => "3")
+      FactoryGirl.create(:notification, :case_number => "4")
+      FactoryGirl.create(:complaint,    :case_number => "5")
+      Case.missing.map {|m| m.case_number}.sort.should eq %w[1 2 3 4 5]
+    end
+
+    it "excludes case numbers that already have cases" do
+      FactoryGirl.create(:case,      :case_number => "1")
+      FactoryGirl.create(:judgement, :case_number => "1")
+      FactoryGirl.create(:hearing,   :case_number => "2")
+      Case.missing.map {|m| m.case_number}.sort.should eq %w[2]
+    end
+
+    it "only includes one new Case per missing number" do
+      FactoryGirl.create(:hearing,    :case_number => "2")
+      FactoryGirl.create(:inspection, :case_number => "2")
+      Case.missing.map {|m| m.case_number}.sort.should eq %w[2]
+    end
   end
 end

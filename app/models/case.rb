@@ -8,7 +8,7 @@
   has_many :notifications, :foreign_key => :case_number, :primary_key => :case_number
 
   has_many :demolitions, :foreign_key => :case_number, :primary_key => :case_number
-  has_many :maintenances, :foreign_key => :case_number, :primary_key => :case_number 
+  has_many :maintenances, :foreign_key => :case_number, :primary_key => :case_number
 
   has_many :judgements, :foreign_key => :case_number, :primary_key => :case_number
   has_one  :case_manager, :foreign_key => :case_number, :primary_key => :case_number
@@ -69,7 +69,7 @@
 
   def status
     step = nil
-    if self.status_type && self.status_id 
+    if self.status_type && self.status_id
       begin
         step = Kernel.const_get(status_type).find(status_id)
       rescue ActiveRecord::RecordNotFound
@@ -194,17 +194,16 @@
 
   def adjudication_steps
     steps_ary = []
-    steps_ary << self.inspections(true) << self.notifications(true) << self.hearings(true) << self.judgement << self.resets(true) 
+    steps_ary << self.inspections(true) << self.notifications(true) << self.hearings(true) << self.judgement << self.resets(true)
     steps_ary.flatten.compact.sort{ |a, b| a.date <=> b.date }
   end
 
   def case_data_error?
-
     if case_steps == 1 && missing_inspection?
       true
     elsif case_steps == 2 && missing_notification?
       true
-    elsif case_steps == 3 && missing_hearing? 
+    elsif case_steps == 3 && missing_hearing?
       true
     elsif case_steps == 4 && missing_judgement?
       true
@@ -218,7 +217,7 @@
 
   def missing_inspection?
     # if the current is empty
-    self.inspections.empty? && 
+    self.inspections.empty? &&
 
     # and and of the future steps are not empty
     ( !self.notifications.empty? || !self.hearings.empty? || !self.judgement.nil?  )
@@ -227,24 +226,23 @@
 
   def missing_notification?
     # if the current is empty
-    self.notifications.empty? && 
+    self.notifications.empty? &&
 
-    (    
-      # the previous step is empty 
+    (
+      # the previous step is empty
       ( self.inspections.empty?) ||
       # OR future steps are not emptry
       ( !self.hearings.empty? || !self.judgement.nil?  )
     )
-
   end
 
   def missing_hearing?
     # if the current is empty
-    self.hearings.empty? && 
+    self.hearings.empty? &&
 
-    (    
-      # the previous step is empty 
-      !( self.inspections.empty? || self.notifications.empty? ) || 
+    (
+      # the previous step is empty
+      !( self.inspections.empty? || self.notifications.empty? ) ||
       # OR future steps are not emptry
       ( !self.judgement.nil?  )
     )
@@ -252,31 +250,26 @@
 
 
   def missing_judgement?
-
     # if the current is empty
-    self.judgement.nil? && 
+    self.judgement.nil? &&
 
-    (    
+    (
       # the previous step is empty
-      !( self.inspections.empty? || self.notifications.empty? || self.hearings.empty? ) || 
+      !( self.inspections.empty? || self.notifications.empty? || self.hearings.empty? ) ||
       # OR future steps are not emptry
       ( !self.demolitions.empty?  )
     )
-
   end
 
   def missing_resolution?
-    
-    !( self.inspections.empty? || self.notifications.empty? || self.hearings.empty? || self.judgement.nil? ) 
+    !( self.inspections.empty? || self.notifications.empty? || self.hearings.empty? || self.judgement.nil? )
   end
-
 
   def resolutions
     res_ary = []
     res_ary << self.demolitions << self.maintenances << self.foreclosure
     res_ary.flatten.compact
   end
-
 
   def self.incomplete
     Case.find_by_sql("select c.* from cases c where c.case_number in (select case_number from judgements j where not exists(select h.case_number from hearings h where h.case_number = j.case_number)) or c.case_number in (select h.case_number from hearings h where not exists (select * from notifications n where n.case_number = h.case_number)) or c.case_number in (select n.case_number from notifications n where not exists (select * from inspections i where i.case_number = n.case_number)) order by c.case_number").uniq
@@ -287,19 +280,10 @@
   end
 
   def self.missing
-    #ratings = Complaint.where(:case_number not inselect(:case_number).uniq
-    case_numbers = []
-    case_numbers << Judgement.find_by_sql('select j.case_number from judgements j where j.case_number not in (select c.case_number from cases c where c.case_number = j.case_number)')#.select(:case_number)
-    case_numbers << Hearing.find_by_sql('select h.case_number from hearings h where h.case_number not in (select c.case_number from cases c where c.case_number = h.case_number)')#.select(:case_number)
-    case_numbers << Inspection.find_by_sql('select i.case_number from inspections i where i.case_number not in (select c.case_number from cases c where c.case_number = i.case_number)')#.select(:case_number)
-    case_numbers << Notification.find_by_sql('select n.case_number from notifications n where n.case_number not in (select c.case_number from cases c where c.case_number = n.case_number)')
-    case_numbers << Complaint.find_by_sql('select k.case_number from complaints k where k.case_number not in (select c.case_number from cases c where k.case_number = k.case_number)')
-    case_numbers.flatten!  
-
-    case_numbers.map! {|x| x.case_number}
-    case_numbers.uniq!
-    cases = case_numbers.map {|case_number| Case.new(:case_number => case_number)}
-    cases
+    [Judgement, Hearing, Inspection, Notification, Complaint].
+      map {|klass| klass.find_by_sql("select k.case_number from #{klass.table_name} k where k.case_number not in (select c.case_number from cases c where c.case_number = k.case_number)")}.flatten.
+      map {|obj| obj.case_number}.uniq.
+      map {|case_number| Case.new(:case_number => case_number)}
   end
 
   def judgement
