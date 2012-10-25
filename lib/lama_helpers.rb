@@ -9,6 +9,7 @@ module LAMAHelpers
       begin
         case_number = incident.Number
         next unless case_number # need to find a better way to deal with this ... revisit post LAMA data cleanup
+        next unless incident.Type == 'Public Nuisance and Blight'
         location = incident.Location
         addresses = AddressHelpers.find_address(location)
         address = addresses.first if addresses
@@ -142,7 +143,7 @@ module LAMAHelpers
         h = kase.last_hearing
         s = kase.last_status
 
-        if kase.judgement || h.is_complete || h != s
+        if kase.judgement || (h && h.is_complete )|| (h && s && h != s)
           schedHearings.destroy_all
           return
         end
