@@ -2,28 +2,38 @@
 
 .lt-ie9{
 
-	footer{
-		background-color: $lightGrey;
-	}
+  footer{
+    background-color: $lightGrey;
+  }
+
+  .property-page{
+    .subscribe{
+      width: 500px;
+    }
+  }
+
 }
 
 
 .lt-ie8{
 
-	.container-addresses{
+  .property-page{
+    .main{
+      width: 60% !important;
 
-		.main{
+    }
+    .sidebar{
 
-			width:56% !important;
-		}
-	}
+      width: 30% !important;
 
-	.about-page-content{
-		.left-bar{
+    }   
+  }
+  .about-page-content{
+    .left-bar{
 
-			.left{
-				width: 45%;
-			}
-		}
-	}
+      .left{
+        width: 45%;
+      }
+    }
+  }
 }
