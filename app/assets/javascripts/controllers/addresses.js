@@ -161,7 +161,13 @@ OpenBlight.addresses = {
           OpenBlight.addresses.markers.push( layer );
 
           var pos = current_feature+1;
-          li = '<li class="address result '+ ((pos > 9) ? " two-digits": "") + ((pos > 99) ? " three-digits": "") +'" data-id="'+ data[current_feature].id +'"> <span class="maps-marker">'+pos+'</span><span class="search-address"><a href="/addresses/'+ data[current_feature].id +'">'+ data[current_feature].address_long +'</a></span></li>';
+
+          var digit_class = (pos > 9) ? ((pos > 99) ? " three-digits ": " two-digits ") : " ";
+          // var digit_class = '';
+
+            
+
+          li = '<li class="address result '+ digit_class +' " data-id="'+ data[current_feature].id +'"> <span class="'+ digit_class +' maps-marker">'+pos+'</span><span class="search-address"><a href="/addresses/'+ data[current_feature].id +'">'+ data[current_feature].address_long +'</a></span></li>';
           $('.search-results ul.list').append(li);
 
           layer.on('dblclick', function(){ window.location.href = link });
