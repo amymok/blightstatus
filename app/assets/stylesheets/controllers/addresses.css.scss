@@ -170,7 +170,7 @@
         font-size: 150%;
         font-weight: 300;
         text-align: left;  
-        margin: 0 15px;
+//        margin: 0 15px;
         color: inherit;      
       }
     }
@@ -408,12 +408,13 @@
 .progress-bar-wrapper {
   margin-top: 5px;
   min-height: 10px;
+  width: 100%;
 
   .table{
 
 
     width:inherit;
-    margin: 0 20px;
+//    margin: 0 20px;
 
 
     tr{
