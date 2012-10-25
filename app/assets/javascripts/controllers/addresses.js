@@ -309,5 +309,5 @@ OpenBlight.addresses = {
       markers[i] = OpenBlight.addresses.markers[i].getLatLng();
     }
     OpenBlight.addresses.map.fitBounds(markers);
-  },
+  }
 }
