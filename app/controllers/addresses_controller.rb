@@ -17,12 +17,12 @@ class AddressesController < ApplicationController
   def show
     if account_signed_in?
       @account = current_account
-      @account_subscribed = !@account.subscriptions.where(:address_id => params[:id]).empty? 
+      @account_subscribed = !@account.subscriptions.where(:address_id => params[:id]).empty?
     end
     @address = Address.find(params[:id])
 
     # if APP_CONFIG['demo_page_id'] == @address.id
-    #   render :action => 'show-demo'  
+    #   render :action => 'show-demo'
     # else
       #respond_with(@address, @account_subscribed)
     # end
@@ -52,7 +52,7 @@ class AddressesController < ApplicationController
         street_name = AddressHelpers.get_street_name(search_term)
 
         if(dir = AddressHelpers.get_direction(search_term))
-          addresses = Address.find_addresses_with_cases_by_cardinal_street(dir,street_name).uniq.order(:house_num) 
+          addresses = Address.find_addresses_with_cases_by_cardinal_street(dir,street_name).uniq.order(:house_num)
         else
           addresses = Address.find_addresses_with_cases_by_street(street_name).uniq.order(:street_name, :house_num)
         end
@@ -67,7 +67,7 @@ class AddressesController < ApplicationController
       @results_empty = @addresses.empty?
       respond_to do |format|
         format.html
-        format.json { render :json => @addresses.to_json(:only => [ :id, :address_long, :latest_type, :point ]) }      
+        format.json { render :json => @addresses.to_json(:only => [ :id, :address_long, :latest_type, :point ]) }
       end
     end
   end
@@ -86,7 +86,7 @@ class AddressesController < ApplicationController
     class_name = ''
 
     append_sql_query = ''
-    sql_params = {:start_date => start_date, :end_date => end_date} 
+    sql_params = {:start_date => start_date, :end_date => end_date}
 
     if params[:only_recent_status].to_i == 1
       append_sql_query = " AND cases.status_type = :status_type "
@@ -136,10 +136,7 @@ class AddressesController < ApplicationController
 
 
     # TODO: REWRITE FRONTEND SO IT CAN HANDLE RETURNED ARRAY OF ADDRESSES
-    # puts "entering loop"
-    puts case_addresses.inspect
     if params[:status] == 'inspections' || params[:status] == 'notifications' || params[:status] == 'hearings'|| params[:status] == 'judgement'
-      # puts "inside loop"
       if cases.nil?
         cases = {}
       end
@@ -154,7 +151,6 @@ class AddressesController < ApplicationController
     respond_to do |format|
         format.json { render :json => case_addresses.to_json(:only => [ :id, :address_long, :latest_type, :status_type, :point ]) }
     end
-      
   end
 
 
@@ -168,7 +164,7 @@ class AddressesController < ApplicationController
 
     respond_to do |format|
         format.json { render :json => @addresses.to_json }
-    end    
+    end
   end
 
 
@@ -184,9 +180,9 @@ class AddressesController < ApplicationController
 
   # DEPRCATED
   def get_stats(status, sql_params)
-    puts '-----------GET STATS-----------------'
-    puts status.inspect
-    puts sql_params.inspect
+    Rails.logger.debug '-----------GET STATS-----------------'
+    Rails.logger.debug status.inspect
+    Rails.logger.debug sql_params.inspect
     case status
       when "inspections"
         Inspection.where(" inspections.inspection_date > :start_date AND inspections.inspection_date < :end_date ",  sql_params).results
