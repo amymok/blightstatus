@@ -28,6 +28,8 @@ OpenBlight.addresses = {
     OpenBlight.addresses.mapAddresses();
     OpenBlight.accounts.subscriptionButton();
     OpenBlight.addresses.showHistory();
+    OpenBlight.addresses.toggleShowViolations();
+
 
     $('.property-history .case').hide();
 
@@ -81,6 +83,17 @@ OpenBlight.addresses = {
     });
   },
 
+
+  toggleShowViolations: function(){
+
+    $("#see-violations").toggle(function() {
+      $("#see-violations").html(' Hide Violations ');
+      $('#list-of-violations').show();
+    }, function(){
+      $("#see-violations").html(' Show Violations ');
+      $('#list-of-violations').hide();
+    });
+  },
 
   
   createSearchResultsMap: function(){
@@ -293,7 +306,7 @@ OpenBlight.addresses = {
   },
 
   getCircleIcon: function(classname){
-    return {
+    return geojsonMarkerOptions = {
         radius: 3,
         fillColor: "#ff7800",
         color: "#000",
