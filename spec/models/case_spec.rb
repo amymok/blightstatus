@@ -58,10 +58,10 @@ describe Case do
       @address1 = FactoryGirl.create(:address, :geopin => 12345678)
       @address2 = FactoryGirl.create(:address, :geopin => 12345678, :address_long => "1019-19 CHARBONNET ST", :address_id => "12321443")
       @address3 = FactoryGirl.create(:address, :geopin => 12345679, :address_long => "1019-19 CHARBONNET ST", :address_id => "12321444")
-      
+
       @case.update_attribute(:geopin, 12345679)
-      @case.assign_address(address_long: '1019-19 CHARBONNET ST') 
-      
+      @case.assign_address(address_long: '1019-19 CHARBONNET ST')
+
       @case.address.should eq(@address3)
     end
   end
@@ -69,10 +69,7 @@ describe Case do
   describe "#most_recent_status" do
     it "returns the most recent workflow step for a case" do
       @inspection = FactoryGirl.create(:inspection, :case => @case, :inspection_date => Time.now - 1.week)
-      p @inspection.date
       @hearing = FactoryGirl.create(:hearing, :case => @case, :hearing_date => Time.now - 1.day)
-      p @hearing.date
-
       @case.most_recent_status.should eq(@hearing)
     end
   end
@@ -81,7 +78,7 @@ describe Case do
     it "returns the first workflow step for a case" do
       @inspection = FactoryGirl.create(:inspection, :case => @case, :inspection_date => Time.now - 1.week)
       @hearing = FactoryGirl.create(:hearing, :case => @case, :hearing_date => Time.now - 1.day)
-      
+
       @case.first_status.should eq(@inspection)
     end
   end
@@ -124,6 +121,7 @@ describe Case do
       result.count.should == 0
     end
   end
+
   describe "#at_inspection2" do
     it "returns # of cases at inspection, should be 1" do
       result = Case.at_inspection
@@ -137,19 +135,19 @@ describe Case do
       FactoryGirl.create(:hearing, :case => @case, :hearing_date => Time.now - 1.day)
       FactoryGirl.create(:judgement, :case => @case)
       FactoryGirl.create(:inspection, :case => @case)
-      
+
       case1 = FactoryGirl.create(:case)
       FactoryGirl.create(:judgement, :case => case1)
       FactoryGirl.create(:inspection, :case => case1)
-      
+
       case2 = FactoryGirl.create(:case)
       FactoryGirl.create(:hearing, :case => case2, :hearing_date => Time.now - 1.day)
       FactoryGirl.create(:inspection, :case => case2)
-      
+
       case3 = FactoryGirl.create(:case)
       FactoryGirl.create(:hearing, :case => case3, :hearing_date => Time.now - 1.day)
       FactoryGirl.create(:judgement, :case => case3)
-      
+
 
       result = Case.complete
       result.count.should == 1
@@ -161,11 +159,11 @@ describe Case do
 
       FactoryGirl.create(:hearing, :case => @case, :hearing_date => Time.now - 1.day)
       FactoryGirl.create(:judgement, :case => @case)
-      
+
       case2 = FactoryGirl.create(:case)
       FactoryGirl.create(:hearing, :case => case2, :hearing_date => Time.now - 1.day)
       FactoryGirl.create(:inspection, :case => case2)
-      
+
       case3 = FactoryGirl.create(:case)
       FactoryGirl.create(:hearing, :case => case3)
 
@@ -179,7 +177,7 @@ describe Case do
       case2 = FactoryGirl.create(:case)
       FactoryGirl.create(:hearing, :case => case2, :hearing_date => Time.now - 1.day)
       FactoryGirl.create(:inspection, :case => case2)
-      
+
       result = Case.without_inspection
       result.count.should == 1
     end
@@ -190,7 +188,7 @@ describe Case do
       @case.address = FactoryGirl.create(:address)
       @case.save
       FactoryGirl.create(:case)
-      
+
       result = Case.matched_count
       result.should == 1
     end
@@ -223,5 +221,29 @@ describe Case do
   end
 
   describe "#update_address_status" do
+  end
+
+  describe "::missing" do
+    it "returns new Case objects for Judgement, Hearing, Inspection, Notification, Complaint" do
+      FactoryGirl.create(:judgement,    :case_number => "1")
+      FactoryGirl.create(:hearing,      :case_number => "2")
+      FactoryGirl.create(:inspection,   :case_number => "3")
+      FactoryGirl.create(:notification, :case_number => "4")
+      FactoryGirl.create(:complaint,    :case_number => "5")
+      Case.missing.map {|m| m.case_number}.sort.should eq %w[1 2 3 4 5]
+    end
+
+    it "excludes case numbers that already have cases" do
+      FactoryGirl.create(:case,      :case_number => "1")
+      FactoryGirl.create(:judgement, :case_number => "1")
+      FactoryGirl.create(:hearing,   :case_number => "2")
+      Case.missing.map {|m| m.case_number}.sort.should eq %w[2]
+    end
+
+    it "only includes one new Case per missing number" do
+      FactoryGirl.create(:hearing,    :case_number => "2")
+      FactoryGirl.create(:inspection, :case_number => "2")
+      Case.missing.map {|m| m.case_number}.sort.should eq %w[2]
+    end
   end
 end

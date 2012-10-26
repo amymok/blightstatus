@@ -21,7 +21,6 @@ describe Address do
 
   describe ".find_addresses_with_cases_by_cardinal_street" do
    it "should return array of addreses that havee cases on a street" do
-      puts "@address  => " + @address.inspect
       c1 = FactoryGirl.create(:case, :address => Address.create(:address_long => '1 N PETERS ST'))
       c1 = FactoryGirl.create(:case, :address => Address.create(:address_long => '1 S PETERS ST'))
       result = Address.find_addresses_with_cases_by_cardinal_street('S','PETERS')
@@ -123,16 +122,16 @@ describe Address do
 
   describe "#most_recent_status_preview" do
     it "displays the most recent status class and time" do
-      dt = DateTime.now - (1.day + 7.hours) #TODO adjust for timezone. should detect timezone 
+      dt = DateTime.now - (1.day + 7.hours) #TODO adjust for timezone. should detect timezone
       FactoryGirl.create(:demolition, :address => @address, :date_started => dt)
       FactoryGirl.create(:maintenance, :address => @address, :date_completed => (DateTime.now - 2.days))
       FactoryGirl.create(:foreclosure, :address => @address, :sale_date => (DateTime.now - 3.days))
 
       c = FactoryGirl.create(:case, :address => @address)
-      FactoryGirl.create(:hearing, :case => c, :hearing_date => (DateTime.now - 30.days))  
-      
+      FactoryGirl.create(:hearing, :case => c, :hearing_date => (DateTime.now - 30.days))
+
       @address.most_recent_status_preview.should == {:type => 'Demolition', :date => dt.strftime('%B %e, %Y')}
-    end    
+    end
   end
 
   describe "#assign_double" do
@@ -167,14 +166,14 @@ describe Address do
       FactoryGirl.create(:case, :address => a)
       result = Address.find_addresses_with_cases_by_cardinal_street('E','CFA')
       result.count.should < Address.find_addresses_with_cases_by_street('CFA').count
-    end    
+    end
   end
   describe ".find_addresses_within_area(ne, sw)" do
     it "return # of cases at -90.04223467290467 29.975021724674335 should be 1" do
         FactoryGirl.create(:case, :address => FactoryGirl.create(:address))
         ne = {"lng" => -90.04223467290467, "lat" => 29.975021724674335}
         sw = {"lng" => -90.04223467290467, "lat" => 29.975021724674335}
-        Address.find_addresses_with_cases_within_area(ne,sw).count.should eq(1)    
+        Address.find_addresses_with_cases_within_area(ne,sw).count.should eq(1)
     end
   end
 end
