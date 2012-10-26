@@ -76,7 +76,7 @@
                     %td.date=kase.judgement.judgement_date.strftime("%-m/%-d/%y")
                     %td
                       -if kase.judgement.status.nil? || kase.judgement.status =~ /Guilty/
-                        A judgmnt of <b>#{kase.judgement.status ? kase.judgement.status.capitalize : 'Guilty'}</b> was reached
+                        A judgment of <b>#{kase.judgement.status ? kase.judgement.status.capitalize : 'Guilty'}</b> was reached
                       -elsif kase.judgement.status =~ /Closed/
                         This case has been <b>Closed</b> #{"(#{kase.judgement.notes})" if kase.judgement.notes}
                       -elsif kase.judgement.status.downcase =~ /rescinded/
