@@ -11,7 +11,9 @@ namespace :reports do
       addresses = Address.where('latest_type is not null').find_each do |address|
         step = address.latest_type && address.latest_id ? Kernel.const_get(address.latest_type).find(address.latest_id) : nil 
         case_number = step ? step.case_number : nil
-        csv << "#{address.id},#{address.address_long},#{case_number},#{address.latest_type}\r"
+        linestring= "#{address.id},#{address.address_long},#{case_number},#{address.latest_type}"
+        puts linestring
+        csv << "#{linestring}\r"
       end 
     end
   end
