@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '3.2.2'
+gem 'rails', '3.2.8'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
@@ -17,7 +17,7 @@ gem 'devise-async'
 
 gem 'lama', :git => 'https://github.com/gangleton/lama.git'
 gem 'savon'
-gem "httpclient", "~> 2.1.5"
+gem "httpclient", "~> 2.3.0"
 
 gem 'delayed_job_active_record'
 
