@@ -122,30 +122,15 @@ namespace :foreclosures do
     success = 0
     failure = 0
     case_matches = 0
-    Foreclosure.where('address_id is null').each do |row|
-      # compare each address in demo list to our address table
-      #address = Address.where("address_long LIKE ?", "%#{row.address_long}%")
-      address = AddressHelpers.find_address(row.address_long)
-
-      unless (address.empty?)
-        fore = Foreclosure.find(row.id)
-        fore.update_attributes(:address_id => address.first.id)      
-        success += 1
-
-        fore.address.cases.each do |c|
-          unless Foreclosure.where("case_number = :case_number", {:case_number => c.case_number}).nil?
-            fore.update_attributes(:case_number => c.case_number)
-            case_matches += 1;
-          end
-        end
-
+    Foreclosure.where('address_id is null').each do |foreclosure|
+      if Address.match_abatement(foreclosure)
+        case_matches +=1 if Case.match_abatement(foreclosure)
+        success +=1
       else
-        puts "#{row.address_long} address not found in address table"
+        puts "#{foreclosure.address_long} address not found in address table"
         failure += 1
       end
     end
-
-
     puts "There were #{success} successful address matches and #{failure} failed address matches and #{case_matches} cases matched"      
   end
 
@@ -153,7 +138,9 @@ namespace :foreclosures do
   task :match_case => :environment  do |t, args|
     # go through each demolition
     foreclosures = Foreclosure.where("address_id is not null and case_number is null")
-    AbatementHelpers.match_case(foreclosures)
+    foreclosures.each do |foreclosure|
+      Case.match_abatement(foreclosure)
+    end
   end
 
   desc "Delete all foreclosures from database"
