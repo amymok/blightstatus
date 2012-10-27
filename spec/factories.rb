@@ -47,6 +47,9 @@ FactoryGirl.define do
     status            {"guilty"}
   end
 
+  factory :complaint do
+  end
+
   factory :maintenance do
   end
 
