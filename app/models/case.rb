@@ -289,4 +289,14 @@
   def judgement
     self.judgements.last
   end
+
+  def self.match_abatement(abatement)
+    if abatement.address  
+      if abatement.address.latest_type && abatement.address.latest_id
+        latest_step = Kernel.const_get(abatement.address.latest_type).find(abatement.address.latest_id)
+        abatement.update_attribute(:case_number,latest_step.case_number) if latest_step && abatement.date && latest_step.date < abatement.date
+      end
+    end
+    abatement.case
+  end
 end

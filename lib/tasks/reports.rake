@@ -17,4 +17,22 @@ namespace :reports do
       end 
     end
   end
+
+
+  desc "Empty streets table"  
+  task :foreclosure => :environment  do |t, args|
+    header = "address_id,address_long,status,notes,sale_date,cdc_number\r"
+    file = "tmp/foreclosures_audit_#{Time.now.strftime("%Y%m%d%H%M%S")}.csv"
+    
+    File.open(file, "w") do |csv|
+      puts "file opened => #{file}"
+      csv << header
+
+      foreclosures = Foreclosure.find_each do |f|
+        linestring= "#{f.address_id},#{f.address_long},#{f.status},#{f.notes},#{f.sale_date.strftime("%m-%d-%Y")},#{f.cdc_case_number}"
+        puts linestring
+        csv << "#{linestring}\r"
+      end 
+    end
+  end
 end

@@ -141,45 +141,31 @@ namespace :demolitions do
     end
   end
 
-  desc "Correlate demolition data with addresses"  
+  desc "Correlate demolitions data with addresses"  
   task :match => :environment  do |t, args|
-    # go through each demolition
+    # go through each foreclosure
     success = 0
     failure = 0
-    case_matches = 0;
-
-    Demolition.all.each do |row|
-      # compare each address in demo list to our address table
-      #address = Address.where("address_long LIKE ?", "%#{row.address_long}%")
-      address = AddressHelpers.find_address(row.address_long)
-
-      unless (address.empty?)
-        demo = Demolition.find(row.id)
-        demo.update_attributes(:address_id => address.first.id)
-        success += 1
-
-        demo.address.cases.each do |c|
-          unless Judgement.where("case_number = :case_number", {:case_number => c.case_number}).nil?
-            demo.update_attributes(:case_number => c.case_number)
-            case_matches += 1;
-          end
-        end
-        
+    case_matches = 0
+    Demolition.where('address_id is null').each do |demolition|
+      if Address.match_abatement(demolition)
+        case_matches += 1 if Case.match_abatement(demolition)
+        success +=1
       else
-        puts "#{row.address_long} address not found in address table "
+        puts "#{demolition.address_long} address not found in address table"
         failure += 1
       end
     end
-
-
     puts "There were #{success} successful address matches and #{failure} failed address matches and #{case_matches} cases matched"      
   end
 
   desc "Correlate demolition data with cases"  
   task :match_case => :environment  do |t, args|
     # go through each demolition
-    demos = Demolition.where("address_id is not null and case_number is null")
-    AbatementHelpers.match_case(demos)
+    demolitions = Demolition.where("address_id is not null and case_number is null")
+    demolitions.each do |demolition|
+      Case.match_abatement(demolition)
+    end
   end
 
   desc "Delete all demolitions from database"

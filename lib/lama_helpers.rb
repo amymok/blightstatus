@@ -1,28 +1,28 @@
 module LAMAHelpers
-  def import_to_database(incidents, client=nil)
+  def import_incidents_to_database(incidents, client=nil)
+    incidents.each do |incident|
+      import_incident_to_database(incident,client) if incident
+    end
+  end
+  def import_incident_to_database(incident, client=nil)
     
-    return if incidents.nil?
+    return if incident.nil?
     
     l = client || LAMA.new({ :login => ENV['LAMA_EMAIL'], :pass => ENV['LAMA_PASSWORD']})
     
-    incidents.each do |incident|
+    #incidents.each do |incident|
       begin
         case_number = incident.Number
-        next unless case_number # need to find a better way to deal with this ... revisit post LAMA data cleanup
-        next unless incident.Type == 'Public Nuisance and Blight'
+        return if case_number.nil? || case_number.length == 0 # need to find a better way to deal with this ... revisit post LAMA data cleanup
+        return unless incident.Type == 'Public Nuisance and Blight'
         location = incident.Location
         addresses = AddressHelpers.find_address(location)
         address = addresses.first if addresses
         division = get_incident_division_by_location(l,address.address_long,case_number) if address
         division = get_incident_division_by_location(l,location,case_number) if division.nil? || division.strip.length == 0
         division = incident.Division if division.nil? || division.strip.length == 0
+        return unless division == 'CE'
         
-        next unless division == 'CE'
-        
-        # action_spawns = nil
-        # judgement_spawns = nil
-        # inspection_spawns = nil
-
         case_state = 'Open'
         case_state = 'Closed' if incident.IsClosed =~/true/
         kase = Case.find_or_create_by_case_number(:case_number => case_number, :state => case_state)
@@ -132,7 +132,7 @@ module LAMAHelpers
         puts "THERE WAS AN EXCEPTION OF TYPE #{ex.class}, which told us that #{ex.message}"
         puts "Backtrace => #{ex.backtrace}"
       end
-    end
+    #end
   end
 
   def validateSchedHearings(kase)
@@ -148,7 +148,7 @@ module LAMAHelpers
           return
         end
 
-        Hearing.where("case_number = '#{kase.case_number}' and is_complete = false and id <> #{h.id}") if schedHearings.count > 0
+        Hearing.where("case_number = '#{kase.case_number}' and is_complete = false and id <> #{h.id}").destroy_all if h &&schedHearings.count > 0
         h.destroy if h && !h.is_complete && kase.judgement && h != kase.last_status
   end
 
@@ -432,7 +432,7 @@ module LAMAHelpers
         return
       end
 
-      import_to_database(incidents, lama)
+      import_incidents_to_database(incidents, lama)
     rescue StandardError => ex
       puts "There was an error of type #{ex.class}, with a message of #{ex.message}"
       puts "Backtrace => #{ex.backtrace}"
@@ -471,7 +471,7 @@ module LAMAHelpers
         return
       end
 
-      import_to_database(incidents, lama)
+      import_incidents_to_database(incidents, lama)
     rescue StandardError => ex
       puts "There was an error of type #{ex.class}, with a message of #{ex.message}"
       puts "Backtrace => #{ex.backtrace}"
