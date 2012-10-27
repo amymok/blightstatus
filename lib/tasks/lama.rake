@@ -206,6 +206,7 @@ namespace :lama do
         kase.destroy
                 
         incident = l.incident(case_number)
+        next if incident.Type == 'Public Nuisance and Blight'
         import_incident_to_database(incident,l)
 
         if Case.where(:case_number => case_number).exists?
