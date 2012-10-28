@@ -25,8 +25,15 @@ module ForeclosureHelpers
 					addr[:street_type] = AddressHelpers.get_street_type addr[:address_long] 
 					addr[:street_name] = AddressHelpers.get_street_name addr[:address_long]
 				end
-
-				Foreclosure.create(status: foreclosure[:sale_status], notes: nil, sale_date: sale_dt, title: foreclosure[:case_title][0..254], cdc_case_number: foreclosure[:cdc_case_number], defendant: foreclosure[:defendant][0..254], plaintiff: foreclosure[:plaintiff][0..254], address_long: foreclosure[:property_address], street_name: addr[:street_name], street_type: addr[:street_type], house_num: addr[:house_num])
+				status = foreclosure[:sale_status]
+				if sale_dt
+					f = Foreclosure.where(:cdc_case_number => cdc_number).first
+					if f
+						f.update_attributes(status: status, sale_date: sale_dt)
+					else
+						Foreclosure.create(status: status, notes: nil, sale_date: sale_dt, title: foreclosure[:case_title][0..254], cdc_case_number: foreclosure[:cdc_case_number], defendant: foreclosure[:defendant][0..254], plaintiff: foreclosure[:plaintiff][0..254], address_long: foreclosure[:property_address], street_name: addr[:street_name], street_type: addr[:street_type], house_num: addr[:house_num])
+					end
+				end
 			end
 		rescue Exception=>ex
           	puts "THERE WAS AN EXCEPTION OF TYPE #{ex.class}, which told us that #{ex.message}"
