@@ -37,7 +37,7 @@ namespace :foreclosures do
         cdc_number = row[cdc_col]
         address_long = row[addr_col]
         puts "writs file row => " << row.to_s
-        ForeclosureHelpers.load(cdc_number, client) if cdc_number && cdc_number != "CDC ID"
+        ForeclosureHelpers.load_foreclosure(cdc_number,client) if cdc_number && cdc_number != "CDC ID"
       end
     end
     puts "foreclosures:loaded_sheriff"
@@ -50,7 +50,7 @@ namespace :foreclosures do
     client = Savon.client ENV['SHERIFF_WSDL']
     cdc_Numbers = args[:cdc_numbers].split('|')
     cdc_Numbers.each do |cdc_number|# sheet.each do |row|
-      ForeclosureHelpers.load(cdc_number, client)          
+      ForeclosureHelpers.load_foreclosure(cdc_number,client)#, client)          
     end
     puts "foreclosures:load_cdcNumbers"
   end

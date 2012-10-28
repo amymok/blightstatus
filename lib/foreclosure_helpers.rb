@@ -1,5 +1,5 @@
 module ForeclosureHelpers
-	def load(cdc_number,client = nil)
+	def load_foreclosure(cdc_number, client=nil)
 		begin
 			client = Savon.client ENV['SHERIFF_WSDL'] if client.nil?
 
