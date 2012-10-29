@@ -3,6 +3,7 @@ class Maintenance < ActiveRecord::Base
   after_save :update_address_status
 
   belongs_to :address
+  belongs_to :case, :foreign_key => :case_number, :primary_key => :case_number
 
   def date
     self.date_completed || self.date_recorded || DateTime.new(0)

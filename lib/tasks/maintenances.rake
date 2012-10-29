@@ -53,33 +53,31 @@ namespace :maintenances do
     end
   end
 
-  desc "Correlate maintenances data with addresses"  
+  desc "Correlate maintenance data with addresses"  
   task :match => :environment  do |t, args|
-    # go through each demolition
+    # go through each maintenance
     success = 0
     failure = 0
-
-    Maintenance.find(:all).each do |m|
-      # compare each address in demo list to our address table
-      #address = Address.where("address_long LIKE ?", "%#{m.address_long}%")
-
-      address = AddressHelpers.find_address(m.address_long)
-      unless (address.empty?)
-        m.update_attributes(:address_id => address.first.id)
-        success += 1
+    case_matches = 0
+    Maintenance.where('address_id is null').each do |maintenance|
+      if Address.match_abatement(maintenance)
+        case_matches +=1 if Case.match_abatement(maintenance)
+        success +=1
       else
-        puts "#{m.address_long} address not found in address table"
+        puts "#{maintenance.address_long} address not found in address table"
         failure += 1
       end
     end
-    puts "There were #{success} successful matches and #{failure} failed matches"
+    puts "There were #{success} successful address matches and #{failure} failed address matches and #{case_matches} cases matched"      
   end
 
   desc "Correlate maintenance data with cases"  
   task :match_case => :environment  do |t, args|
     # go through each demolition
     maintenances = Maintenance.where("address_id is not null and case_number is null")
-    AbatementHelpers.match_case(maintenances)
+    maintenances.each do |maintenance|
+      Case.match_abatement(maintenance)
+    end
   end
 
   desc "Delete all maintenances from database"

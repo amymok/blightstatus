@@ -130,4 +130,15 @@ class Address < ActiveRecord::Base
   def load_cases
     LAMAHelpers.import_by_location(self.address_long)
   end
+
+  def self.match_abatement(abatement)
+    address = AddressHelpers.find_address(abatement.address_long) if abatement.address_long
+    abatement.update_attribute(:address_id, address.first.id) if address && address.length > 0
+    abatement.update_attribute(:case_number, nil) if abatement.case_number && abatement.address_id && abatement.address_id != abatement.case.address_id
+    abatement.address
+  end
+  def most_relevant_case
+    status = most_recent_status
+    status ? status.case_number : nil
+  end
 end
