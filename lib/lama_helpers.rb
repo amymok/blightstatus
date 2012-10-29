@@ -551,4 +551,27 @@ module LAMAHelpers
     puts "Unused SpawnHash => #{spawnHash.inspect}"
     spawnHash.clear
   end
+
+  def reloadCase(case_number, client=nil)
+    client = LAMA.new({:login => ENV['LAMA_EMAIL'], :pass => ENV['LAMA_PASSWORD']}) unless client
+    reloaded = nil
+    kase = Case.where(:case_number => case_number).first
+    if kase
+      puts "destroying => #{case_number}"
+      kase.complaint.destroy if kase.complaint
+      kase.inspections.destroy_all
+      kase.notifications.destroy_all
+      kase.hearings.destroy_all
+      kase.judgements.destroy_all
+      kase.resets.destroy_all
+      kase.destroy
+    end        
+    incident = client.incident(case_number)
+    if incident && incident.Type == 'Public Nuisance and Blight' 
+      import_incident_to_database(incident,client)
+      reloaded = true if Case.where(:case_number => case_number).any?
+    else
+      reloaded = false
+    end
+  end
 end
