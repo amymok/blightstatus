@@ -187,41 +187,19 @@ namespace :lama do
       return
     end
     date = args[:before_date]
-    success = 0
-    failure = []
-    file = "log/case_spawn_reload_#{Time.now.strftime("%Y%m%d%H%M%S")}.csv"
-    l = LAMA.new({ :login => ENV['LAMA_EMAIL'], :pass => ENV['LAMA_PASSWORD']})
+    now = Time.now
+    file = "log/case_spawn_reload_#{now.strftime("%Y%m%d%H%M%S")}.csv"
+    l = LAMA.new({:login => ENV['LAMA_EMAIL'], :pass => ENV['LAMA_PASSWORD']})
     File.open(file, "w") do |log|
       puts "file opened => #{file}"
-      
       Case.where("created_at < '#{date}'").find_each do |kase|
-        case_number = kase.case_number
-        puts "destroying => #{case_number}"
-        kase.complaint.destroy if kase.complaint
-        kase.inspections.destroy_all
-        kase.notifications.destroy_all
-        kase.hearings.destroy_all
-        kase.judgements.destroy_all
-        kase.resets.destroy_all
-        kase.destroy
-                
-        incident = l.incident(case_number)
-        next unless incident.Type == 'Public Nuisance and Blight'
-        import_incident_to_database(incident,l)
-
-        if Case.where(:case_number => case_number).exists?
-          msg = "SUCCESS : #{case_number} reimported with spawns"
-          puts msg
-          log << "#{msg}\r"  
-          success += 1
-        else
-          failure << case_number
-          msg = "FAILURE : #{case_number} NOT reimported with spawns !!!!!!" 
+        if LAMAHelpers.reloadCase(kase.case_number,l).nil?
+          msg = "FAILURE : #{kase.case_number} NOT reimported with spawns !!!!!!" 
           puts msg
           log << "#{msg}\r"
           return
-        end        
+        end
       end 
     end
-  end
+  end  
 end

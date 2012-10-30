@@ -15,6 +15,7 @@ module LAMAHelpers
         case_number = incident.Number
         return if case_number.nil? || case_number.length == 0 # need to find a better way to deal with this ... revisit post LAMA data cleanup
         return unless incident.Type == 'Public Nuisance and Blight'
+        return if case_number =~ /ENVHADJ/
         location = incident.Location
         addresses = AddressHelpers.find_address(location)
         address = addresses.first if addresses
@@ -224,6 +225,16 @@ module LAMAHelpers
           c = Complaint.new(:case_number => kase.case_number, :date_received => event.DateEvent, :status => event.Status)
           c.save if Complaint.where("case_number = '#{kase.case_number}' and (date_received >= '#{c.date.beginning_of_day.to_formatted_s(:db)}' and date_received <= '#{c.date.end_of_day.to_formatted_s(:db)}')").count == 0
         end
+      elsif event.Type =~ /Research Property Record/
+        if event.SpawnID && event.SpawnID != '-1' && spawn_hash[event.SpawnID] 
+          rpfDate = spawn_hash[event.SpawnID][:date]
+          spawn_hash.delete(event.SpawnID)
+        else 
+          rpfDate = event.DateEvent
+        end
+        Case.find(kase.id).ordered_case_steps.each do |step|
+          step.date <= DateTime.parse(rpfDate) ? (step.destroy unless step.class == Inspection) : break
+        end
       elsif (event.Name =~ /Guilty/ || event.Status =~ /Guilty/ || event.Type =~ /Guilty/) && (event.Name =~ /Hearing/ || event.Status =~ /Hearing/ || event.Type =~ /Hearing/)#event.Name =~ /Hearing/
         if event.Name =~ /Guilty/
           notes = event.Name.strip
@@ -354,6 +365,8 @@ module LAMAHelpers
         kase.outcome = 'Closed: In Compliance'
       elsif action.Type =~ /Complaint/
         action_spawn[:step] = Complaint.to_s
+      elsif action.Type =~ /Research Property Record/
+        action_spawn[:step] = 'Research Property Record'
       end
       #elsif action.Type =~ /Set/ && action.Type =~ /Hearing/ && action.Type =~ /Date/
         # action_spawn[:step] = 'Set Hearing Date' 
@@ -546,9 +559,36 @@ module LAMAHelpers
         Complaint.create(:case_number => kase.case_number, :date_received => spawn[:date], :status => spawn[:notes])
       elsif spawn[:step] == Reset.to_s
         Reset.create(:case_number => kase.case_number, :reset_date => spawn[:date])
+      elsif spawn[:step] == 'Research Property Record'
+        Case.find(kase.id).ordered_case_steps.each do |step|
+          step.date <= DateTime.parse(rpfDate) ? (step.destroy unless step.class == Inspection) : break
+        end
       end
     end
-    puts "Unused SpawnHash => #{spawnHash.inspect}"
     spawnHash.clear
+  end
+
+  def reloadCase(case_number, client=nil)
+    client = LAMA.new({:login => ENV['LAMA_EMAIL'], :pass => ENV['LAMA_PASSWORD']}) unless client
+    reloaded = nil
+    kase = Case.where(:case_number => case_number).first
+    if kase
+      puts "destroying => #{case_number}"
+      kase.complaint.destroy if kase.complaint
+      kase.inspections.destroy_all
+      kase.notifications.destroy_all
+      kase.hearings.destroy_all
+      kase.judgements.destroy_all
+      kase.resets.destroy_all
+      kase.destroy
+    end        
+    incident = client.incident(case_number)
+    return false if case_number =~ /ENVHADJ/
+    if incident && incident.Type == 'Public Nuisance and Blight' 
+      import_incident_to_database(incident,client)
+      reloaded = true if Case.where(:case_number => case_number).any?
+    else
+      reloaded = false
+    end
   end
 end
