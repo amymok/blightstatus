@@ -583,7 +583,7 @@ module LAMAHelpers
       kase.destroy
     end        
     incident = client.incident(case_number)
-    if incident && (incident.Type == 'Public Nuisance and Blight' || !case_number =~ /ENVHADJ/)
+    if incident && (incident.Type == 'Public Nuisance and Blight' && !case_number =~ /ENVHADJ/)
       import_incident_to_database(incident,client)
       reloaded = true if Case.where(:case_number => case_number).any?
     else
