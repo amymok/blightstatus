@@ -192,7 +192,7 @@ namespace :lama do
     l = LAMA.new({:login => ENV['LAMA_EMAIL'], :pass => ENV['LAMA_PASSWORD']})
     File.open(file, "w") do |log|
       puts "file opened => #{file}"
-      Case.select(:case_number).where("created_at < '#{date}'").find_each do |kase|
+      Case.where("created_at < '#{date}'").find_each do |kase|
         if LAMAHelpers.reloadCase(kase.case_number,l).nil?
           msg = "FAILURE : #{kase.case_number} NOT reimported with spawns !!!!!!" 
           puts msg

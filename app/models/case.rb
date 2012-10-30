@@ -41,8 +41,9 @@
 
   def ordered_case_steps
     case_steps = []
-    case_steps << self.inspections << self.hearings << self.notifications << self.judgements << (self.demolitions || self.foreclosure || self.maintenances )
-    case_steps.flatten.compact
+    case_steps << self.inspections << self.notifications << self.hearings << self.judgements << (self.demolitions || self.foreclosure || self.maintenances )
+    case_steps = case_steps.flatten.compact
+    case_steps.sort{ |a, b| b.date <=> a.date }
   end
 
 
@@ -188,7 +189,7 @@
 
   def case_steps
     case_steps = []
-    case_steps << self.inspections.first << self.hearings.first   << self.notifications.first << self.judgement << (self.demolitions || self.foreclosure || self.maintenances )
+    case_steps << self.inspections.first << self.notifications.first << self.hearings.first  << self.judgement << (self.demolitions || self.foreclosure || self.maintenances )
     case_steps.flatten.compact.count
   end
 
