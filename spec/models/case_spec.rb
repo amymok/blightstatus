@@ -246,4 +246,15 @@ describe Case do
       Case.missing.map {|m| m.case_number}.sort.should eq %w[2]
     end
   end
+
+  describe "#resolutions" do
+    it "includes demolitions, maintenances, and foreclosures" do
+      c = FactoryGirl.create(:case,        :case_number => "37")
+      d = FactoryGirl.create(:demolition,  :case_number => "37")
+      m = FactoryGirl.create(:maintenance, :case_number => "37")
+      f = FactoryGirl.create(:foreclosure, :case_number => "37")
+
+      c.resolutions.should =~ [d,m,f]
+    end
+  end
 end
