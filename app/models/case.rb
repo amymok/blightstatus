@@ -267,9 +267,7 @@
   end
 
   def resolutions
-    res_ary = []
-    res_ary << self.demolitions << self.maintenances << self.foreclosure
-    res_ary.flatten.compact
+    demolitions + maintenances + [foreclosure]
   end
 
   def self.incomplete
