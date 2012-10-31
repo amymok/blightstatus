@@ -39,10 +39,16 @@ class Address < ActiveRecord::Base
       begin
         latest_step = Kernel.const_get(latest_type).find(latest_id)
       rescue ActiveRecord::RecordNotFound
-        self.update_attributes(:latest_id => nil, :latest_type => nil)
+        #if !self.workflow_steps.empty?
+        latest_step = self.workflow_steps.sort{ |a, b| a.date <=> b.date }.last #can be faster of case.last_step is used
+        if latest_step
+          self.update_attributes({:latest_id => latest_step.id, :latest_type => latest_step.class.to_s})
+        else
+          self.update_attributes(:latest_id => nil, :latest_type => nil)
+        end
       end
     elsif !self.workflow_steps.empty?
-      latest_step = self.workflow_steps.sort{ |a, b| a.date <=> b.date }.last
+      latest_step = self.workflow_steps.sort{ |a, b| a.date <=> b.date }.last #can be faster of case.last_step is used
       self.update_attributes({:latest_id => latest_step.id, :latest_type => latest_step.class.to_s})
     end
     return latest_step
@@ -85,9 +91,8 @@ class Address < ActiveRecord::Base
   def workflow_steps
     steps_ary = []
     self.cases.each do |c|
-      steps_ary << c.accela_steps
+      steps_ary << c.ordered_case_steps
     end
-    steps_ary << self.resolutions
     steps_ary.flatten.compact
   end
 
@@ -133,12 +138,25 @@ class Address < ActiveRecord::Base
 
   def self.match_abatement(abatement)
     address = AddressHelpers.find_address(abatement.address_long) if abatement.address_long
-    abatement.update_attribute(:address_id, address.first.id) if address && address.length > 0
-    abatement.update_attribute(:case_number, nil) if abatement.case_number && abatement.address_id && abatement.address_id != abatement.case.address_id
-    abatement.address
+    address = address.first
+    if address
+      abatement.update_attribute(:address_id, address.id)
+      abatement.update_attribute(:case_number, nil) if abatement.case_number && abatement.address_id && abatement.address_id != abatement.case.address_id
+      abatement.address
+      
+      case_number = abatement.case_number
+      address.sorted_cases.each do |kase|
+        case_status = kase.status
+        if case_status
+          abatement.date > case_status.date ? abatement.case_number = kase.case_number : break
+        end
+      end
+      abatement.save unless abatement.case_number == case_number
+    end    
   end
+
   def most_relevant_case
     status = most_recent_status
-    status ? status.case_number : nil
+    status ? status.case : nil
   end
 end
