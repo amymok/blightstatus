@@ -85,7 +85,7 @@
                 .progress-arrow.pending{:class => "judgement-#{kase.case_number}", :style => "z-index: 11"}
 
           %td
-            -unless kase.resolutions.empty?
+            -if kase.resolutions.any?
               -if kase.resolutions.first.date > Time.now
                 .progress-arrow.resolution.loading{:class => "resolution-#{kase.case_number}", :style => "z-index: 10"}
               -else
