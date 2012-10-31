@@ -91,8 +91,9 @@ class Address < ActiveRecord::Base
   def workflow_steps
     steps_ary = []
     self.cases.each do |c|
-      steps_ary << c.ordered_case_steps
+      steps_ary << c.accela_steps
     end
+    steps_ary << self.resolutions
     steps_ary.flatten.compact
   end
 
