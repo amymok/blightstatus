@@ -60,7 +60,7 @@
               %span.arrow                                    
             %td.status 
               -if r.class == Hearing
-                Case Heard
+                -r.date < DateTime.now ? 'Case Heard' : 'Hearing Scheduled'
               -else
                 Judgment Recorded
             %td

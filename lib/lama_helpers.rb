@@ -226,16 +226,16 @@ module LAMAHelpers
           c = Complaint.new(:case_number => kase.case_number, :date_received => event.DateEvent, :status => event.Status)
           c.save if Complaint.where("case_number = '#{kase.case_number}' and (date_received >= '#{c.date.beginning_of_day.to_formatted_s(:db)}' and date_received <= '#{c.date.end_of_day.to_formatted_s(:db)}')").count == 0
         end
-      # elsif event.Type =~ /Research Property Record/
-      #   if event.SpawnID && event.SpawnID != '-1' && spawn_hash[event.SpawnID] 
-      #     rpfDate = spawn_hash[event.SpawnID][:date]
-      #     spawn_hash.delete(event.SpawnID)
-      #   else 
-      #     rpfDate = event.DateEvent
-      #   end
-      #   Case.find(kase.id).ordered_case_steps.each do |step|
-      #     step.date <= DateTime.parse(rpfDate) ? (step.destroy unless step.class == Inspection) : break
-      #   end
+      elsif event.Type =~ /Research Property Record/
+        if event.SpawnID && event.SpawnID != '-1' && spawn_hash[event.SpawnID] 
+          rpfDate = spawn_hash[event.SpawnID][:date]
+          spawn_hash.delete(event.SpawnID)
+        else 
+          rpfDate = event.DateEvent
+        end
+        Case.find(kase.id).ordered_case_steps.each do |step|
+          step.date <= DateTime.parse(rpfDate) ? (step.destroy unless step.class == Inspection) : break
+        end
       elsif (event.Name =~ /Guilty/ || event.Status =~ /Guilty/ || event.Type =~ /Guilty/) && (event.Name =~ /Hearing/ || event.Status =~ /Hearing/ || event.Type =~ /Hearing/)#event.Name =~ /Hearing/
         if event.Name =~ /Guilty/
           notes = event.Name.strip
@@ -323,11 +323,11 @@ module LAMAHelpers
         end
       end
     elsif event.class == Hashie::Mash && (event.Type =~ /Administrative Hearing/ || event.Name =~ /Administrative Hearing/)  && event.IsComplete =~ /false/ && kase.state == 'Open'
-      last_inspection = kase.last_inspection
+      last_notification = kase.last_notification
       last_hearing = kase.last_hearing
       h = Hearing.new(:case_number => kase.case_number, :hearing_date => event.DateEvent, :hearing_status => event.Status, :hearing_type => event.Type, :is_complete => false)
       h.spawn_id = event.SpawnID.to_i if event.SpawnID != '-1'
-      h.save if kase.judgement.nil? && last_inspection && h.date > last_inspection.date && (last_hearing.nil? || ((last_hearing && h.date > last_hearing.date) && (last_inspection > last_hearing.date)))      
+      h.save if kase.judgement.nil? && last_notification && h.date > last_notification.date && (last_hearing.nil? || ((last_hearing && h.date > last_hearing.date) && (last_notification > last_hearing.date)))         
     end
   end
   def parseInspection(case_number,inspection)
@@ -361,8 +361,8 @@ module LAMAHelpers
         kase.outcome = 'Closed: In Compliance'
       elsif action.Type =~ /Complaint/
         action_spawn[:step] = Complaint.to_s
-      # elsif action.Type =~ /Research Property Record/
-      #   action_spawn[:step] = 'Research Property Record'
+      elsif action.Type =~ /Research Property Record/
+        action_spawn[:step] = 'Research Property Record'
       end
     end
     return nil if action_spawn && action_spawn[:step].nil?
@@ -548,10 +548,10 @@ module LAMAHelpers
         Complaint.create(:case_number => kase.case_number, :date_received => spawn[:date], :status => spawn[:notes]) unless Complaint.where("case_number = '#{kase.case_number}' and (date_received >= '#{DateTime.parse(spawn[:date]).beginning_of_day.to_formatted_s(:db)}' and date_received <= '#{DateTime.parse(spawn[:date]).end_of_day.to_formatted_s(:db)}')").exists?
       elsif spawn[:step] == Reset.to_s
         Reset.create(:case_number => kase.case_number, :reset_date => spawn[:date]) unless Reset.where("case_number = '#{kase.case_number}' and (reset_date >= '#{DateTime.parse(spawn[:date]).beginning_of_day.to_formatted_s(:db)}' and reset_date <= '#{DateTime.parse(spawn[:date]).end_of_day.to_formatted_s(:db)}')").exists?
-      # elsif spawn[:step] == 'Research Property Record'
-      #   Case.find(kase.id).ordered_case_steps.each do |step|
-      #     step.date <= DateTime.parse(rpfDate) ? (step.destroy unless step.class == Inspection) : break
-      #   end
+      elsif spawn[:step] == 'Research Property Record'
+        Case.find(kase.id).ordered_case_steps.each do |step|
+          step.date <= DateTime.parse(rpfDate) ? (step.destroy unless step.class == Inspection) : break
+        end
       end
     end
     spawnHash.clear
