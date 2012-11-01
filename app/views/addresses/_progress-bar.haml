@@ -63,8 +63,11 @@
                 .progress-arrow.pending{:class => "notification-#{kase.case_number}", :style => "z-index: 13"}
 
           %td
-            -unless kase.hearings.empty? 
-              .progress-arrow.hearing{:class => "hearing-#{kase.case_number}", :style => "z-index: 12"}
+            -unless kase.hearings.empty?
+              -if kase.last_hearing.date > Time.now 
+                .progress-arrow.pending{:class => "hearing-#{kase.case_number}", :style => "z-index: 12"}
+              -else
+                .progress-arrow.hearing{:class => "hearing-#{kase.case_number}", :style => "z-index: 12"}
             -else
               -if kase.missing_hearing?
                 .progress-arrow.error{:class => "hearing-#{kase.case_number}", :style => "z-index: 12"}
