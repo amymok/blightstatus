@@ -74,17 +74,17 @@ namespace :foreclosures do
     puts "There were #{success} successful address matches and #{failure} failed address matches and #{case_matches} cases matched"      
   end
 
-  desc "Correlate foreclosure data with cases"  
-  task :match_case => :environment  do |t, args|
-    # go through each demolition
-    foreclosures = Foreclosure.where("address_id is not null and case_number is null")
-    foreclosures.each do |foreclosure|
-      Case.match_abatement(foreclosure)
-    end
-  end
+  # desc "Correlate foreclosure data with cases"  
+  # task :match_case => :environment  do |t, args|
+  #   # go through each demolition
+  #   foreclosures = Foreclosure.where("address_id is not null and case_number is null")
+  #   foreclosures.each do |foreclosure|
+  #     Case.match_abatement(foreclosure)
+  #   end
+  # end
 
-  desc "Delete all foreclosures from database"
-  task :drop => :environment  do |t, args|
-    Foreclosure.destroy_all
-  end
+  # desc "Delete all foreclosures from database"
+  # task :drop => :environment  do |t, args|
+  #   Foreclosure.destroy_all
+  # end
 end

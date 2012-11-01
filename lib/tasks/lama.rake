@@ -202,4 +202,38 @@ namespace :lama do
       end 
     end
   end  
+
+  desc "reload cases imported without spawn"
+  task :reload_cases, [:case_number] => :environment do |t, args|
+    if args[:case_number].nil?
+      puts "this task requires | delimited list of cases"
+      return
+    end
+    case_numbers = args[:case_number]
+    l = LAMA.new({:login => ENV['LAMA_EMAIL'], :pass => ENV['LAMA_PASSWORD']})
+    case_numbers.split('|').each do |case_number|
+      if LAMAHelpers.reloadCase(case_number,l).nil?
+        puts "FAILURE : #{case_number} NOT reimported with spawns !!!!!!" 
+        break
+      end
+    end
+  end
+
+  desc "reload cases imported without spawn"
+  task :reload_cases_file, [:file] => :environment do |t, args|
+    if args[:file].nil?
+      puts "this task requires an input file"
+      return
+    end
+    file = args[:file]
+    l = LAMA.new({:login => ENV['LAMA_EMAIL'], :pass => ENV['LAMA_PASSWORD']})
+    IO.readlines(file).each do |line|
+      case_number =  line.strip
+      if LAMAHelpers.reloadCase(case_number,l).nil?
+        puts "FAILURE : #{case_number} NOT reloaded from file"
+        break
+      end
+      puts "#{case_number} => processed"
+    end
+  end
 end

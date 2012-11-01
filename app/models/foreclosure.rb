@@ -15,6 +15,14 @@ class Foreclosure < ActiveRecord::Base
     end
   end
 
+  after_destroy do
+    if self.case
+      self.case.update_last_status
+    elsif self.address
+        self.address.most_recent_status
+    end
+  end
+
   def date
     self.sale_date || DateTime.new(0)
   end

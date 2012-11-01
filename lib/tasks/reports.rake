@@ -1,3 +1,5 @@
+require "#{Rails.root}/lib/lama_helpers.rb"
+include LAMAHelpers
 namespace :reports do
   desc "Empty streets table"  
   task :address_status => :environment  do |t, args|
@@ -9,9 +11,14 @@ namespace :reports do
       csv << header
 
       addresses = Address.where('latest_type is not null').find_each do |address|
-        step = address.latest_type && address.latest_id ? Kernel.const_get(address.latest_type).find(address.latest_id) : nil 
-        case_number = step ? step.case_number : nil
-        linestring= "#{address.id},#{address.address_long},#{case_number},#{address.latest_type}"
+        step = address.most_recent_status
+        case_number = step.case_number
+        # if case_number.nil?
+        #   LAMAHelpers.import_by_location(address.address_long)
+        #   step = address.most_recent_status
+        #   case_number = step.case_number
+        # end
+        linestring= "#{address.id},#{address.address_long},#{case_number},#{step.class.to_s}"
         puts linestring
         csv << "#{linestring}\r"
       end 

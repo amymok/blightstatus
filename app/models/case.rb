@@ -31,12 +31,20 @@
     self.ordered_hearings.last
   end
 
+  def last_notification
+    self.ordered_notifications.last
+  end
+  
   def ordered_hearings
     self.hearings.sort{ |a, b| b.date <=> a.date }
   end
 
   def ordered_inspections
     self.inspections.sort{ |a, b| b.date <=> a.date }
+  end
+
+  def ordered_notifications
+    self.notifications.sort{ |a, b| b.date <=> a.date }
   end
 
   def ordered_case_steps
@@ -267,9 +275,7 @@
   end
 
   def resolutions
-    res_ary = []
-    res_ary << self.demolitions << self.maintenances << self.foreclosure
-    res_ary.flatten.compact
+    demolitions + maintenances + [foreclosure]
   end
 
   def self.incomplete

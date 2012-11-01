@@ -61,4 +61,30 @@ namespace :addresses do
 
     #end
   end
+
+  desc "Empty streets table"  
+  task :load_cases_for_addresses_with_only_abatements => :environment  do |t, args|
+    addresses = Address.includes(:cases).where("latest_type in ('#{Foreclosure.to_s}','#{Maintenance.to_s}','#{Demolition.to_s}') and cases.id is null").find_each do |address|
+      step = address.most_recent_status
+      LAMAHelpers.import_by_location(address.address_long) if step && step.case_number.nil? 
+    end
+  end
+
+  desc "generate address_list"
+  task :address_list, [:where] => :environment do |t, args|
+    if args[:where].nil?
+      puts "this task requires a clause"
+      return
+    end
+    where = args[:where]
+    file = "tmp/cache/rake/address_list_#{where.gsub(/ /,'_')}_#{Time.now.strftime("%Y%m%d%H%M%S")}.csv"
+    l = LAMA.new({:login => ENV['LAMA_EMAIL'], :pass => ENV['LAMA_PASSWORD']})
+    File.open(file, "w") do |log|
+      puts "file opened => #{file}"
+      Address.select(:id).where(where).find_each do |address|
+        puts address.id
+        log << address.id << '|'
+      end
+    end
+  end    
 end

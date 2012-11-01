@@ -34,4 +34,21 @@ namespace :cases do
   task :drop => :environment  do |t, args|
     Case.destroy_all
   end
+
+  desc "generate case_list"
+  task :case_list, [:where] => :environment do |t, args|
+    if args[:where].nil?
+      puts "this task requires a clause"
+      return
+    end
+    where = args[:where]
+    file = "tmp/cache/rake/case_list_#{where.gsub(/ /,'_').gsub('\'','').gsub('%','')}_#{Time.now.strftime("%Y%m%d%H%M%S")}.csv"
+    l = LAMA.new({:login => ENV['LAMA_EMAIL'], :pass => ENV['LAMA_PASSWORD']})
+    File.open(file, "w") do |log|
+      puts "file opened => #{file}"
+      Case.select(:case_number).where(where).find_each do |kase|
+        log << "#{kase.case_number}\n"
+      end
+    end
+  end    
 end
