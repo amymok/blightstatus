@@ -69,4 +69,22 @@ namespace :addresses do
       LAMAHelpers.import_by_location(address.address_long) if step && step.case_number.nil? 
     end
   end
+
+  desc "generate address_list"
+  task :address_list, [:where] => :environment do |t, args|
+    if args[:where].nil?
+      puts "this task requires a clause"
+      return
+    end
+    where = args[:where]
+    file = "tmp/cache/rake/address_list_#{where.gsub(/ /,'_')}_#{Time.now.strftime("%Y%m%d%H%M%S")}.csv"
+    l = LAMA.new({:login => ENV['LAMA_EMAIL'], :pass => ENV['LAMA_PASSWORD']})
+    File.open(file, "w") do |log|
+      puts "file opened => #{file}"
+      Address.select(:id).where(where).find_each do |address|
+        puts address.id
+        log << address.id << '|'
+      end
+    end
+  end    
 end
