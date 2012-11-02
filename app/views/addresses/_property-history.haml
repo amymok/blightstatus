@@ -86,11 +86,11 @@
 
 
       / These are resolutions brought through a code enforcement case
-      -unless kase.resolutions.empty?
+      -if kase.resolutions.any?
         %tr{:class => "case-history-resolution case-history-resolution-#{kase.case_number}"}
           %td
             %table.table-nolines
-            -@address.resolutions.each do |r|
+            -kase.resolutions.each do |r|
               %tr
                 %td
                   %span.arrow

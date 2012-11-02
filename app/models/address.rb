@@ -145,14 +145,7 @@ class Address < ActiveRecord::Base
       abatement.update_attribute(:case_number, nil) if abatement.case_number && abatement.address_id && abatement.address_id != abatement.case.address_id
       abatement.address
       
-      case_number = abatement.case_number
-      address.sorted_cases.each do |kase|
-        case_status = kase.status
-        if case_status
-          abatement.date > case_status.date ? abatement.case_number = kase.case_number : break
-        end
-      end
-      abatement.save unless abatement.case_number == case_number
+      Case.match_abatement(abatement) if abatement.address
     end    
   end
 

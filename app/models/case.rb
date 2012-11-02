@@ -298,12 +298,15 @@
   end
 
   def self.match_abatement(abatement)
-    if abatement.address  
-      if abatement.address.latest_type && abatement.address.latest_id
-        latest_step = Kernel.const_get(abatement.address.latest_type).find(abatement.address.latest_id)
-        abatement.update_attribute(:case_number,latest_step.case_number) if latest_step && abatement.date && latest_step.date < abatement.date
+    if abatement.address
+      case_number = abatement.case_number
+      abatement.address.sorted_cases.each do |kase|
+        case_status = kase.status
+        if case_status
+          abatement.date > case_status.date ? abatement.case_number = kase.case_number : break
+        end
       end
+      abatement.save unless abatement.case_number == case_number
     end
-    abatement.case
   end
 end
