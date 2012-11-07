@@ -227,15 +227,15 @@ namespace :lama do
     end
     file = args[:file]
     l = LAMA.new({:login => ENV['LAMA_EMAIL'], :pass => ENV['LAMA_PASSWORD']})
-    IO.readlines(file).each do |line|
-      case_number =  line.strip
-      next if Case.where(:case_number => case_number).exists?
-      puts "loading #{case_number}"
-      if LAMAHelpers.reloadCase(case_number,l).nil?
-        puts "FAILURE : #{case_number} NOT reloaded from file"
-        break
+    outfile = "tmp/cache/rake/pipeline_reload_#{DateTime.now.strftime("%Y%m%d%H%M%S")}.csv"
+    File.open(outfile, "w") do |log|
+      IO.readlines(file).each do |line|
+        case_number =  line.strip
+        next if Case.where(:case_number => case_number).exists?
+        puts "loading #{case_number}"
+        log << "#{case_number}|"
+        puts "#{case_number} => processed"
       end
-      puts "#{case_number} => processed"
     end
   end
 end
