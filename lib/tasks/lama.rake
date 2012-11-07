@@ -220,7 +220,7 @@ namespace :lama do
   end
 
   desc "reload cases imported without spawn"
-  task :reload_cases_file, [:file] => :environment do |t, args|
+  task :reload_pipeline_non_existent_cases_file, [:file] => :environment do |t, args|
     if args[:file].nil?
       puts "this task requires an input file"
       return
@@ -229,6 +229,8 @@ namespace :lama do
     l = LAMA.new({:login => ENV['LAMA_EMAIL'], :pass => ENV['LAMA_PASSWORD']})
     IO.readlines(file).each do |line|
       case_number =  line.strip
+      next if Case.where(:case_number => case_number).exists?
+      puts "loading #{case_number}"
       if LAMAHelpers.reloadCase(case_number,l).nil?
         puts "FAILURE : #{case_number} NOT reloaded from file"
         break
