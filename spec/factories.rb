@@ -59,6 +59,7 @@ FactoryGirl.define do
 
   factory :notification do
     #are there any fields to require?
+    notified   { DateTime.new(rand(1000)) }
   end
 
   factory :reset do
