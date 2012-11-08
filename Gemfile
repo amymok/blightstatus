@@ -17,7 +17,8 @@ gem 'devise-async'
 
 gem 'lama', :git => 'https://github.com/gangleton/lama.git'
 gem 'savon'
-gem "httpclient", "~> 2.3.0"
+gem 'httpclient', "~> 2.3.0"
+# gem 'mechanize'
 
 gem 'delayed_job_active_record'
 
@@ -54,16 +55,16 @@ end
 
 # Testing
 group :test, :development do
-  gem "test-unit"
-	gem "rspec-rails", '>= 2.9.0' 
-	gem "shoulda"
+  gem 'test-unit'
+	gem 'rspec-rails', '>= 2.9.0' 
+	gem 'shoulda'
 
-	gem "capybara"
+	gem 'capybara'
 	
-	gem "factory_girl_rails"
-  gem "faker"
+	gem 'factory_girl_rails'
+  gem 'faker'
 
-  gem "simplecov"
+  gem 'simplecov'
 end
 
 group :development do
@@ -71,7 +72,7 @@ group :development do
 end
 
 group :test do
-  gem "rake"
+  gem 'rake'
 end
 
 # To use ActiveModel has_secure_password
