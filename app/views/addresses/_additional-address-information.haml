@@ -4,19 +4,23 @@
     %h2
       Additional Information
     %ul
-      -address.demolitions.group_by(&:address_id).each do |a,d|
+      -address.demolitions.group_by(&:program_name).each do |a,d|
         %li
           This property was 
-          -if d.first.program_name == "NORA"
-            sold to the state and demolished through the <b>Road Home</b> program.
+          =a
+          -if d.first.program_name == "FEMA"
+            demolished under by <b>FEMA</b>
+          -elsif d.first.program_name == "NORA"
+            sold to the state and demolished through the <b>Road Home</b> program
           -elsif d.first.program_name == "IDC"
             demolished because it was determined to be in <b>Imminent Danger of Collapse</b> 
           -elsif d.first.program_name == "SDER"
-            demolished under the City's Strategic Demolition program
-          -elsif d.first.program_name == "NOSD"
-            demolished under the City's Strategic Demolition program
+            demolished under the <b>City's Strategic Demolition</b> program
+          -elsif d.first.program_name== "NOSD"
+            demolished under the <b>City's Strategic Demolition</b> program
           -else
             demolished
+
 
           on
           %b=d.first.date_completed.strftime("%-m/%-d/%y")
@@ -31,7 +35,7 @@
             =d.notes
 
 
-      / -address.maintenances.each do |d|
-      /   %li
-      /     This property was demolished on:
-      /     =d.date_completed.strftime("%-m/%-d/%y")
+      -address.maintenances.each do |d|
+        %li
+          This lot was cleared by #{r.program_name} on
+          =d.r.date.strftime("%-m/%-d/%y")

@@ -103,8 +103,10 @@
                         %td.date=r.date.strftime("%-m/%-d/%y")
                         %td 
                           This property was 
+                          -if r.program_name == "FEMA"
+                            demolished under by <b>FEMA</b>
                           -if r.program_name == "NORA"
-                            sold to the state and demolished through the <b>Road Home</b> program.
+                            sold to the state and demolished through the <b>Road Home</b> program
                           -elsif r.program_name == "IDC"
                             demolished because it was determined to be in <b>Imminent Danger of Collapse</b> 
                           -elsif r.program_name == "SDER"
