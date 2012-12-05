@@ -517,15 +517,15 @@
       background: url("/assets/single-progress-arrows-2.png") no-repeat scroll 0 -172px transparent;
 
       &.pending {
-        background: url("/assets/single-progress-arrows-2.png") no-repeat scroll 0px -54px transparent !important;
+        background: url("/assets/single-progress-arrows-2.png") no-repeat scroll -5px -54px transparent !important;
       }
 
       &.loading{
-        background: url("/assets/single-progress-arrows-2.png") no-repeat scroll 0 -152px transparent !important;        
+        background: url("/assets/single-progress-arrows-2.png") no-repeat scroll -5px -152px transparent !important;        
       }
 
       &.error{
-        background: url("/assets/single-progress-arrows-2.png") no-repeat scroll 0 -127px transparent !important;
+        background: url("/assets/single-progress-arrows-2.png") no-repeat scroll -5px -127px transparent !important;
       }
 
     }
