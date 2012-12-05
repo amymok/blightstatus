@@ -1,44 +1,58 @@
-require 'rgeo/shapefile'
 require "#{Rails.root}/lib/address_helpers.rb"
+require "#{Rails.root}/lib/import_helpers.rb"
 
 
 namespace :addresses do
   desc "Load data.nola.gov addresses into database"
-  task :load => :environment do
-
-    shpfile = "#{Rails.root}/lib/assets/NOLA_Addresses_20121109_wgs84/NOLA_Addresses_20121109_wgs84.shp"
-    dist_shpfile = "#{Rails.root}/lib/assets/NOLA_Council_Districts_wgs84/NOLA_Council_Districts_wgs84.shp"
-    districts = {}
+  task :load, [:address_file_name, :neighborhood_file_name, :bucket_name] => :environment  do |t, args|
+    args.with_defaults(:bucket_name => "neworleansdata", :districts_file_name => "NOLA_Council_Districts_wgs84.geojson", :address_file_name => "NOLA_Addresses_20121109.geojson")  
+    p args
 
 
-    RGeo::Shapefile::Reader.open(dist_shpfile) do |file|
-      file.each do |record|
-        districts[record.attributes["OBJECTID"]] = {:council_district => record.attributes["COUNCILDIS"], :geom => record.geometry}
-      end
+    #connect to amazon
+    p "Downloading GeoJSON of districts: "
+    districts_list = ImportHelpers.download_geojson_from_amazon(args.districts_file_name, args.bucket_name)
+    p "Done."
+
+    #connect to amazon
+    p "Downloading GeoJSON of addresses: "
+    address_list = ImportHelpers.download_geojson_from_amazon(args.address_file_name, args.bucket_name)
+    p "Done."
+
+
+
+    Rails.logger.info "File contains #{address_list.count} records"
+
+
+    p districts_list.inspect
+
+    districts_list.each do |record|
+      # districts_list[record['properties']['OBJECTID']] = {:council_district => record['attributes']['COUNCILDIS'], :geom => record['geometry']}
     end
 
-    new_addresses_count = 0
-    RGeo::Shapefile::Reader.open(shpfile, {:srid => -1}) do |file|
-      Rails.logger.info "File contains #{file.num_records} records"
-      file.each do |n|
-        record = n.attributes
-        addr = nil
-        if addr = Address.where("address_id = ?", record["ADDRESS_ID"]).first
-          puts "updating address id #{record["ADDRESS_ID"]}"
-          addr.update_attributes(:point => n.geometry, :official => true, :address_id => record["ADDRESS_ID"], :street_full_name => record["ADDRESS_LA"].sub(/^\d+\s/, ''), :address_long => record["ADDRESS_LA"], :geopin => record["GEOPIN"], :house_num => record["HOUSE_NUMB"], :parcel_id => record["PARCEL_ID"], :status => record["STATUS"], :street_id => record["STREET_ID"], :street_name => record["STREET"], :street_type => record["TYPE"], :x => record["X"], :y => record["Y"] )
-        else
-          puts "creating new address id #{record["ADDRESS_ID"]}"
-          addr = Address.create(:point => n.geometry, :official => true, :address_id => record["ADDRESS_ID"], :street_full_name => record["ADDRESS_LA"].sub(/^\d+\s/, ''), :address_long => record["ADDRESS_LA"], :geopin => record["GEOPIN"], :house_num => record["HOUSE_NUMB"], :parcel_id => record["PARCEL_ID"], :status => record["STATUS"], :street_id => record["STREET_ID"], :street_name => record["STREET"], :street_type => record["TYPE"], :x => record["X"], :y => record["Y"] )
-          new_addresses_count = new_addresses + 1;
-        end
 
-        districts.each do |d|
-          if d[1][:geom].contains?(addr.point)
-            addr.case_district = d[1][:council_district]
-          end
-        end
-        addr.save
+    new_addresses_count = 0
+
+
+    address_list.each do |n|
+      record = n['properties']
+      addr = nil
+      if addr = Address.where("address_id = ?", record["ADDRESS_ID"]).first
+        puts "updating address id #{record["ADDRESS_ID"]}"
+        addr.update_attributes(:point => n.geometry, :official => true, :address_id => record["ADDRESS_ID"], :street_full_name => record["ADDRESS_LA"].sub(/^\d+\s/, ''), :address_long => record["ADDRESS_LA"], :geopin => record["GEOPIN"], :house_num => record["HOUSE_NUMB"], :parcel_id => record["PARCEL_ID"], :status => record["STATUS"], :street_id => record["STREET_ID"], :street_name => record["STREET"], :street_type => record["TYPE"], :x => record["X"], :y => record["Y"] )
+      else
+        puts "creating new address id #{record["ADDRESS_ID"]}"
+        addr = Address.create(:point => n.geometry, :official => true, :address_id => record["ADDRESS_ID"], :street_full_name => record["ADDRESS_LA"].sub(/^\d+\s/, ''), :address_long => record["ADDRESS_LA"], :geopin => record["GEOPIN"], :house_num => record["HOUSE_NUMB"], :parcel_id => record["PARCEL_ID"], :status => record["STATUS"], :street_id => record["STREET_ID"], :street_name => record["STREET"], :street_type => record["TYPE"], :x => record["X"], :y => record["Y"] )
+        new_addresses_count = new_addresses + 1;
       end
+
+      districts_list.each do |d|
+        p d.inspect
+        # if d[1][:geom].contains?(addr.point)
+        #   addr.case_district = d[1][:council_district]
+        # end
+      end
+      addr.save
     end
 
     puts "Total addresses #{new_addresses_count}"
