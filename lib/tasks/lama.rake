@@ -238,4 +238,41 @@ namespace :lama do
       end
     end
   end
+
+  desc "reload cases without steps"
+  task :reload_cases_without_steps => :environment do |t, args|
+    l = LAMA.new({:login => ENV['LAMA_EMAIL'], :pass => ENV['LAMA_PASSWORD']})
+    where = "hearings.id IS NULL AND judgements.id IS NULL AND inspections.id IS NULL AND notifications.id IS NULL AND filed IS NULL AND state = 'Open'"
+    Case.includes([:inspections,:notifications, :hearings, :judgements]).where(where).find_each do |kase|
+      if LAMAHelpers.reloadCase(kase.case_number,l).nil?
+        puts "FAILURE : #{case_number} failed to re-import !!!!!!" 
+        break
+      end
+    end
+  end
+
+  desc "save case filed date for all cases with no steps and no filed date"
+  task :update_filed_case_without_steps => :environment do |t, args|    
+    l = LAMA.new({ :login => ENV['LAMA_EMAIL'], :pass => ENV['LAMA_PASSWORD']})
+    where = "hearings.id IS NULL AND judgements.id IS NULL AND inspections.id IS NULL AND notifications.id IS NULL AND filed IS NULL AND state = 'Open'"
+    Case.includes([:inspections,:notifications, :hearings, :judgements]).where(where).find_each do |kase|
+      puts kase.case_number
+      incident = l.incident(kase.case_number)
+      if incident && incident.DateFiled
+        kase.update_attribute(:filed, incident.DateFiled)
+      end
+    end
+  end
+
+  desc "save case filed date for all cases"
+  task :update_filed_case => :environment do |t, args|    
+    l = LAMA.new({ :login => ENV['LAMA_EMAIL'], :pass => ENV['LAMA_PASSWORD']})
+    Case.where(:filed => nil).find_each do |kase|
+      puts kase.case_number
+      incident = l.incident(kase.case_number)
+      if incident && incident.DateFiled
+        kase.update_attribute(:filed, incident.DateFiled)
+      end
+    end
+  end
 end
