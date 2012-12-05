@@ -146,4 +146,23 @@
             %li City of New Orleans Permits & Licensing system
             %li City of New Orleans & Road Home Program <a href="https://data.nola.gov/Administrative-Data/BlightStat-Demolitions/abvi-rghr">demolition data</a>
             %li <a href="http://civilsheriff.com/">Orleans Parish Sheriff</a>’s foreclosure data
+        .view-all-faq
+          / Button to trigger modal
+          %a{"data-toggle" => "modal", :href => "#myModal", :role => "button"} More Info >
+          / Modal
+          #myModal.modal.hide.fade{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
+            .modal-header
+              %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
+              %h2#myModalLabel Data Sources
+            .modal-body{:style => "font-weight: lighter"}
+              %p
+                Our data about <b>inspections</b>, <b>notifications</b>, <b>hearings</b>, and <b>judgments</b> comes directly from the City of New Orleans' internal land management system, called LAMA. We refresh this data every 10 minutes.
+              %p
+                Data about <b>resolutions</b> comes from a few different sources: 
+              %p
+                We pull <b>demolition</b> data from a spreadsheet on New Orleans' open data portal, <a href="http://data.nola.gov">data.nola.gov</a>. We refresh this data monthly, to reflect the City's update schedule for demolition data. 
+              %p
+                Data about <b>foreclosures</b> and Sheriff sales comes directly from the internal data management system of the Orleans Parish Sheriff's Office. We refresh this data daily.
 
+            .modal-footer
+              %button.btn.btn-primary{"aria-hidden" => "true", "data-dismiss" => "modal"} Return to Website
