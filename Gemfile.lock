@@ -75,13 +75,13 @@ GEM
     daemons (1.1.9)
     dbf (2.0.1)
       fastercsv (~> 1.5.4)
-    debugger (1.2.1)
+    debugger (1.2.2)
       columnize (>= 0.3.1)
       debugger-linecache (~> 1.1.1)
-      debugger-ruby_core_source (~> 1.1.4)
+      debugger-ruby_core_source (~> 1.1.5)
     debugger-linecache (1.1.2)
       debugger-ruby_core_source (>= 1.1.1)
-    debugger-ruby_core_source (1.1.4)
+    debugger-ruby_core_source (1.1.5)
     delayed_job (3.0.3)
       activesupport (~> 3.0)
     delayed_job_active_record (0.3.3)
@@ -296,7 +296,7 @@ DEPENDENCIES
   aws-s3
   capybara
   coffee-rails (~> 3.2.1)
-  debugger
+  debugger (= 1.2.2)
   delayed_job_active_record
   devise
   devise-async

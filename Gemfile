@@ -38,7 +38,7 @@ gem 'thin'
 
 gem 'newrelic_rpm'
 
-gem 'debugger'
+gem 'debugger', '1.2.2'
 
 # Gems used only for assets and not required
 # in production environments by default.
