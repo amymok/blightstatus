@@ -47,6 +47,10 @@
     self.notifications.sort{ |a, b| b.date <=> a.date }
   end
 
+  def ordered_judgements
+    self.judgements.sort{ |a, b| b.date <=> a.date }
+  end
+
   def ordered_case_steps
     case_steps = []
     case_steps << self.inspections << self.notifications << self.hearings << self.judgements << (self.demolitions || self.foreclosure || self.maintenances )
@@ -294,7 +298,7 @@
   end
 
   def judgement
-    self.judgements.last
+    self.ordered_judgements.last
   end
 
   def self.match_abatement(abatement)

@@ -53,8 +53,8 @@
 
 
 
-      -unless kase.ordered_hearings_and_judgements.empty?
-        -kase.ordered_hearings_and_judgements.each do |r|
+      -unless kase.ordered_hearings.empty?
+        -kase.ordered_hearings.each do |r|
           %tr{:class => "case-history-#{r.class} case-history-#{r.class}-#{kase.case_number}"}
             %td
               %span.arrow                                    
@@ -70,19 +70,26 @@
                     %td.date=r.date.strftime("%-m/%-d/%y")
                     %td
                       The case against this property #{r.date > Time.now ? 'will be' : 'was'} heard 
-              -else
-                %table.table-nolines
-                  %tr
-                    %td.date=kase.judgement.judgement_date.strftime("%-m/%-d/%y")
-                    %td
-                      -if kase.judgement.status.nil? || kase.judgement.status =~ /Guilty/
-                        A judgment of <b>#{kase.judgement.status ? kase.judgement.status.capitalize : 'Guilty'}</b> was reached
-                      -elsif kase.judgement.status =~ /Closed/
-                        This case has been <b>Closed</b> #{"(#{kase.judgement.notes})" if kase.judgement.notes}
-                      -elsif kase.judgement.status.downcase =~ /rescinded/
-                        The previous judgment for this case has been <b>rescinded</b>
-                      -else
-                        A judgment of <b>#{kase.judgement.status}</b> was reached
+
+        -if kase.judgement
+          %tr{:class => "case-history-#{kase.judgement.class} case-history-#{kase.judgement.class}-#{kase.case_number}"}
+            %td
+              %span.arrow                                    
+            %td.status 
+              Judgment Recorded
+            %td
+              %table.table-nolines
+                %tr
+                  %td.date=kase.judgement.judgement_date.strftime("%-m/%-d/%y")
+                  %td
+                    -if kase.judgement.status.nil? || kase.judgement.status =~ /Guilty/
+                      A judgment of <b>#{kase.judgement.status ? kase.judgement.status.capitalize : 'Guilty'}</b> was reached
+                    -elsif kase.judgement.status =~ /Closed/
+                      This case has been <b>Closed</b> #{"(#{kase.judgement.notes})" if kase.judgement.notes}
+                    -elsif kase.judgement.status.downcase =~ /rescinded/
+                      The previous judgment for this case has been <b>rescinded</b>
+                    -else
+                      A judgment of <b>#{kase.judgement.status}</b> was reached
 
 
       / These are resolutions brought through a code enforcement case
