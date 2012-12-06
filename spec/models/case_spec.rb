@@ -165,7 +165,9 @@ describe Case do
       FactoryGirl.create(:inspection, :case => case2)
 
       case3 = FactoryGirl.create(:case)
-      FactoryGirl.create(:hearing, :case => case3)
+      # FactoryGirl.create(:hearing, :case => case3)
+      FactoryGirl.create(:hearing, :case => case3, :hearing_date => Time.now - 2.day)
+
 
       result = Case.hearings_without_judgement
       result.count.should == 2
