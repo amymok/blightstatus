@@ -275,4 +275,16 @@ namespace :lama do
       end
     end
   end
+
+  desc "generate case_list"
+  task :reload_cases_where_steps_after_judgement => :environment do |t, args|
+    l = LAMA.new({:login => ENV['LAMA_EMAIL'], :pass => ENV['LAMA_PASSWORD']})
+    puts "#{Case.includes([:inspections, :notifications, :hearings, :judgements]).where('judgements.judgement_date < hearings.hearing_date OR judgements.judgement_date <  inspections.inspection_date OR notifications.notified > judgements.judgement_date').count}"
+    Case.includes([:inspections, :notifications, :hearings, :judgements]).where('judgements.judgement_date < hearings.hearing_date OR judgements.judgement_date <  inspections.inspection_date OR notifications.notified > judgements.judgement_date').find_each do |kase|
+      if LAMAHelpers.reloadCase(kase.case_number,l).nil?
+        puts "FAILURE : #{case_number} failed to re-import !!!!!!" 
+        break
+      end
+    end
+  end    
 end
