@@ -298,6 +298,10 @@
   end
 
   def judgement
+    juds = self.ordered_judgements.reverse
+    juds.each do |j|
+      return j if j.status
+    end
     self.ordered_judgements.last
   end
 
@@ -312,5 +316,9 @@
       end
       abatement.save unless abatement.case_number == case_number
     end
+  end
+
+  def history
+    accela_steps.sort{|a, b| a.date <=> b.date}
   end
 end

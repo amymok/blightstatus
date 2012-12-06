@@ -176,7 +176,7 @@ module LAMAHelpers
 
           j = Judgement.new(:case_number => kase.case_number, :notes => spawn_hash[event.SpawnID][:notes], :status => spawn_hash[event.SpawnID][:status], :judgement_date => spawn_hash[event.SpawnID][:date], :spawn_id => event.SpawnID.to_i)# unless spawn_hash[event.SpawnID][:status].strip =~ /Pending/
           Judgement.where("case_number = '#{kase.case_number}' and (judgement_date >= '#{j.date.beginning_of_day.to_formatted_s(:db)}' and judgement_date <= '#{j.date.end_of_day.to_formatted_s(:db)}')").destroy_all
-          j.save unless j.status =~ /Pending/
+          j.save unless j.status =~ /Pending/ || j.notes =~ /reset/
           spawn_hash.delete(event.SpawnID)
         else  
           Hearing.create(:case_number => kase.case_number, :hearing_date => event.DateEvent, :hearing_status => event.Status, :hearing_type => event.Type, :is_complete => true) unless Hearing.where("case_number = '#{kase.case_number}' and (hearing_date >= '#{DateTime.parse(event.DateEvent).beginning_of_day.to_formatted_s(:db)}' and hearing_date <= '#{DateTime.parse(event.DateEvent).end_of_day.to_formatted_s(:db)}')").exists?#, :spawn_id => event.SpawnID.to_i)#, :is_valid => true)
