@@ -1,19 +1,39 @@
 .case-history
   %table.table.table-condensed.timeline
     %tbody
-    -if kase.history.empty?
-      %tr{:class => "case-history-inspection case-history-inspection-#{kase.case_number}"}
-        %td 
-          %span.arrow            
+    -if kase.filed
+      %tr{:class => "case-history-resolution case-history-resolution-#{kase.case_number}"}
+        %td
+          %span.arrow
         %td.status
-          Inspected
+          Case Filed
         %td
           %table.table-nolines
-            %td{:colspan => "3", :style => "text-align: center"} 
-              -if kase.state == 'Open'
-                A case for this property was created#{' on ' << kase.filed.strftime('%-m/%-d/%y') if kase.filed}. Inspection is pending.
-              -else
-                A case for this property was created#{' on ' << kase.filed.strftime('%-m/%-d/%y') if kase.filed}. No futher actions have occured. 
+            %tr
+              %td.date=kase.filed.strftime("%-m/%-d/%y")
+              %td A case for this property was created
+
+    -if kase.history.empty?
+      %tr{:class => "case-history-inspection case-history-inspection-#{kase.case_number}"}
+        -if kase.state == 'Open'
+          %td 
+            %span.arrow            
+          %td.status
+            Inspection
+          %td
+            %table.table-nolines
+              %td{:colspan => "3", :style => "text-align: center"} 
+                -if kase.state == 'Open'
+                  Inspection is pending.
+        -elsif kase.state == 'Closed'
+          %td 
+            %span.arrow            
+          %td.status
+            Case Closed
+          %td
+            %table.table-nolines
+              %td{:colspan => "3", :style => "text-align: center"}                 
+                A case for this property was created. No futher actions have occured. 
                 =link_to('#why-data-incomplete', "data-animation" => "true", :trigger => "hover", :delay => 100, "data-placement"=>"bottom", :rel=>"tooltip", "data-toggle"=>"modal", "data-title"=>"Receive notifications when the status of this property changes") do
                   Why?
 
@@ -21,6 +41,19 @@
       -case step.class.to_s
       -when 'Inspection'
         %tr{:class => "case-history-inspection case-history-inspection-#{kase.case_number}"}
+        -if kase.judgement && step.date > kase.judgement.date && step == kase.last_inspection
+          %td 
+            %span.arrow            
+          %td.status 
+            %span
+              Judgment Posted
+          %td
+            %table.table-nolines
+              %tr
+                %td.date=step.inspection_date.strftime("%-m/%-d/%y")
+                %td 
+                  The judgment for this case was posted
+        -else
           %td 
             %span.arrow            
           %td.status 
@@ -40,6 +73,7 @@
                       -step.inspection_findings.each_with_index do |violation, index|
                         %p  
                           #{index+1}) #{violation.finding.gsub('HCEV', '')}
+      
 
       -when 'Notification'
         %tr{:class => "case-history-notification case-history-notification-#{kase.case_number}"}

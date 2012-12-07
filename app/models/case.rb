@@ -36,26 +36,26 @@
   end
   
   def ordered_hearings
-    self.hearings.sort{ |a, b| b.date <=> a.date }
+    self.hearings.sort{ |a, b| a.date <=> b.date }
   end
 
   def ordered_inspections
-    self.inspections.sort{ |a, b| b.date <=> a.date }
+    self.inspections.sort{ |a, b| a.date <=> b.date }
   end
 
   def ordered_notifications
-    self.notifications.sort{ |a, b| b.date <=> a.date }
+    self.notifications.sort{ |a, b| a.date <=> b.date }
   end
 
   def ordered_judgements
-    self.judgements.sort{ |a, b| b.date <=> a.date }
+    self.judgements.sort{ |a, b| a.date <=> b.date }
   end
 
   def ordered_case_steps
     case_steps = []
     case_steps << self.inspections << self.notifications << self.hearings << self.judgements << (self.demolitions || self.foreclosure || self.maintenances )
     case_steps = case_steps.flatten.compact
-    case_steps.sort{ |a, b| b.date <=> a.date }
+    case_steps.sort{ |a, b| a.date <=> b.date }
   end
 
 
