@@ -40,9 +40,12 @@ namespace :lama do
     date = Time.now
     end_date = date - 1.day
 
-    Rake::Task["lama:load_by_date"].invoke(end_date, date)
-
     Hearing.clear_incomplete
+    Rake::Task["lama:load_by_date"].invoke(end_date, date)
+  end
+
+  desc "Send notifications for new events"
+  task :send_notifications => :environment do |t, args|
     Account.all.each(&:send_digest)
   end
 
