@@ -9,7 +9,7 @@ describe Subscription do
       @subscription = FactoryGirl.create(:subscription)
       kase = FactoryGirl.create(:case)
       @subscription.address.cases << kase
-      kase.inspections << FactoryGirl.create(:inspection)
+      kase.inspections << FactoryGirl.create(:inspection, :inspection_date => (DateTime.now + 1.day))
     end
 
     it "returns true if an address or addresses' steps have been updated" do
