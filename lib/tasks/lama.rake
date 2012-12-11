@@ -38,9 +38,12 @@ namespace :lama do
   desc "Import day's LAMA events"
   task :load_latest => :environment do |t, args|
     date = Time.now
-    end_date = date - 1.day
+    event_dates = [] 
+    event_dates << Inspection.last.date << Hearing.last.date << Notification.last.date << Judgement.last.date
+    end_date = event_dates.sort{|a,b| a <=> b}.last 
 
     Hearing.clear_incomplete
+    puts "load lama start:#{end_date.strftime("%-m/%-d/%y")} - end#{date.strftime("%-m/%-d/%y")}"
     Rake::Task["lama:load_by_date"].invoke(end_date, date)
   end
 
