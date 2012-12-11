@@ -18,8 +18,8 @@ class Account < ActiveRecord::Base
       subs = subscriptions.select{ |s| s.updated_since_last_notification? }
       if subs.length > 0
         t = Time.now
-        subs.each{ |s| s.update_attribute(:date_notified, t) }
         AccountMailer.delay.deliver_digest(self, subs)
+        subs.each{ |s| s.update_attribute(:date_notified, t) }
       end
     end
   end
