@@ -80,6 +80,11 @@
     self.ordered_case_steps.last
   end
 
+
+  def is_enviromental_hazard?
+    !self.case_number.match('ENVHADJ').blank?
+  end
+
   def status
     step = nil
     if self.status_type && self.status_id
