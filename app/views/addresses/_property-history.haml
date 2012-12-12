@@ -1,199 +1,235 @@
 .case-history
+  
   %table.table.table-condensed.timeline
-    %tbody
-    -if kase.filed
-      %tr{:class => "case-history-resolution case-history-resolution-#{kase.case_number}"}
-        %td
-          %span.arrow
-        %td.status
-          Case Filed
-        %td
-          %table.table-nolines
-            %tr
-              %td.date=kase.filed.strftime("%-m/%-d/%y")
-              %td A case for this property was created
+    / %tbody
 
-    -if kase.history.empty?
-      %tr{:class => "case-history-inspection case-history-inspection-#{kase.case_number}"}
-        -if kase.state == 'Open'
-          %td 
-            %span.arrow            
+    -if kase.is_enviromental_hazard?
+
+      -kase.history.each do |step|
+        -case step.class.to_s
+        -when 'Inspection'
+          %tr{:class => "case-history-inspection case-history-inspection-#{kase.case_number}"}
+            %td 
+              %span.arrow            
+            %td.status 
+              %span
+                Inspected
+            %td
+              %table.table-nolines
+                %tr
+                  %td.date=step.inspection_date.strftime("%-m/%-d/%y")
+                  %td 
+                    Property was inspected
+        -when 'Judgement'
+          %tr{:class => "case-history-inspection case-history-inspection-#{kase.case_number}"}
+            %td 
+              %span.arrow            
+            %td.status 
+              %span
+                Judgment Posted
+            %td
+              %table.table-nolines
+                %tr
+                  %td.date
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  %td 
+                    The judgment for this case was posted
+
+
+    -else
+      -if kase.filed
+        %tr{:class => "case-history-resolution case-history-resolution-#{kase.case_number}"}
+          %td
+            %span.arrow
           %td.status
-            Inspection
+            Case Filed
           %td
             %table.table-nolines
-              %td{:colspan => "3", :style => "text-align: center"} 
-                -if kase.state == 'Open'
-                  Inspection is pending.
-        -elsif kase.state == 'Closed'
-          %td 
-            %span.arrow            
-          %td.status
-            Case Closed
-          %td
-            %table.table-nolines
-              %td{:colspan => "3", :style => "text-align: center"}                 
-                A case for this property was created. No futher actions have occured. 
-                =link_to('#why-data-incomplete', "data-animation" => "true", :trigger => "hover", :delay => 100, "data-placement"=>"bottom", :rel=>"tooltip", "data-toggle"=>"modal", "data-title"=>"Receive notifications when the status of this property changes") do
-                  Why?
+              %tr
+                %td.date=kase.filed.strftime("%-m/%-d/%y")
+                %td A case for this property was created
 
-    -kase.history.each do |step|
-      -case step.class.to_s
-      -when 'Inspection'
+      -if kase.history.empty?
         %tr{:class => "case-history-inspection case-history-inspection-#{kase.case_number}"}
-        -if kase.judgement && step.date > kase.judgement.date && step == kase.last_inspection
-          %td 
-            %span.arrow            
-          %td.status 
-            %span
-              Judgment Posted
-          %td
-            %table.table-nolines
-              %tr
-                %td.date=step.inspection_date.strftime("%-m/%-d/%y")
-                %td 
-                  The judgment for this case was posted
+          -if kase.state == 'Open'
+            %td 
+              %span.arrow            
+            %td.status
+              Inspection
+            %td
+              %table.table-nolines
+                %td{:colspan => "3", :style => "text-align: center"} 
+                  -if kase.state == 'Open'
+                    Inspection is pending.
+          -elsif kase.state == 'Closed'
+            %td 
+              %span.arrow            
+            %td.status
+              Case Closed
+            %td
+              %table.table-nolines
+                %td{:colspan => "3", :style => "text-align: center"}                 
+                  A case for this property was created. No futher actions have occured. 
+                  =link_to('#why-data-incomplete', "data-animation" => "true", :trigger => "hover", :delay => 100, "data-placement"=>"bottom", :rel=>"tooltip", "data-toggle"=>"modal", "data-title"=>"Receive notifications when the status of this property changes") do
+                    Why?
+
+      -kase.history.each do |step|
+        -case step.class.to_s
+        -when 'Inspection'
+          %tr{:class => "case-history-inspection case-history-inspection-#{kase.case_number}"}
+          -if kase.judgement && step.date > kase.judgement.date && step == kase.last_inspection
+            %td 
+              %span.arrow            
+            %td.status 
+              %span
+                Judgment Posted
+            %td
+              %table.table-nolines
+                %tr
+                  %td.date=step.inspection_date.strftime("%-m/%-d/%y")
+                  %td 
+                    The judgment for this case was posted
+          -else
+            %td 
+              %span.arrow            
+            %td.status 
+              %span
+                Inspected
+            %td
+              %table.table-nolines
+                %tr
+                  %td.date=step.inspection_date.strftime("%-m/%-d/%y")
+                  %td 
+                    Property was inspected
+                    -unless step.inspection_findings.first.nil?
+                      and was found with #{step.inspection_findings.count} violations. 
+                      %a{:id=>"see-violations", :href=>"#"}
+                        See Violations
+                      #list-of-violations
+                        -step.inspection_findings.each_with_index do |violation, index|
+                          %p  
+                            #{index+1}) #{violation.finding.gsub('HCEV', '')}
+        
+
+        -when 'Notification'
+          %tr{:class => "case-history-notification case-history-notification-#{kase.case_number}"}
+            %td
+              %span.arrow                                    
+            %td.status Notice Sent
+            %td
+              %table.table-nolines
+                %tr
+                  %td.date=step.date.strftime("%-m/%-d/%y")
+                  %td A notice of hearing was sent to the property owner.
+
+        -when 'Hearing'
+          %tr{:class => "case-history-#{step.class} case-history-#{step.class}-#{kase.case_number}"}
+            %td
+              %span.arrow                                    
+            %td.status 
+              #{step.date < Time.now ? 'Case Heard' : 'Hearing Scheduled'}
+            %td
+              %table.table-nolines
+                %tr
+                  %td.date=step.date.strftime("%-m/%-d/%y")
+                  %td The case against this property #{step.date > Time.now ? 'will be' : 'was'} heard 
+
+        -when 'Judgement'
+          %tr{:class => "case-history-#{step.class} case-history-#{step.class}-#{kase.case_number}"}
+            %td
+              %span.arrow                                    
+            %td.status 
+              Judgment Recorded
+            %td
+              %table.table-nolines
+                %tr
+                  %td.date=step.date.strftime("%-m/%-d/%y")
+                  %td
+                    -if step.status.nil? || step.status =~ /Guilty/
+                      A judgment of <b>#{step.status ? step.status.capitalize : 'Guilty'}</b> was reached
+                    -elsif step.status =~ /Closed/
+                      This case has been <b>Closed</b> #{"(#{step.notes})" if step.notes}
+                    -elsif step.status.downcase =~ /rescinded/
+                      The previous judgment for this case has been <b>rescinded</b>
+                    -else
+                      A judgment of <b>#{step.status}</b> was reached
+
+        -when 'Demolition'
+          %tr{:class => "case-history-resolution case-history-resolution-#{kase.case_number}"}
+            %td
+              %span.arrow
+            %td.status 
+              Demolition
+            %td
+              %table.table-nolines
+                %tr
+                  %td.date=step.date.strftime("%-m/%-d/%y")
+                  %td 
+                    This property was 
+                    -if step.program_name == "FEMA"
+                      demolished under by <b>FEMA</b>
+                    -elsif step.program_name == "NORA"
+                      sold to the state and demolished through the <b>Road Home</b> program
+                    -elsif step.program_name == "IDC"
+                      demolished because it was determined to be in <b>Imminent Danger of Collapse</b> 
+                    -elsif step.program_name == "SDER"
+                      demolished under the <b>City's Strategic Demolition</b> program
+                    -elsif step.program_name == "NOSD"
+                      demolished under the <b>City's Strategic Demolition</b> program
+                    -else
+                      demolished
+
+        -when 'Foreclosure'
+          %tr{:class => "case-history-resolution case-history-resolution-#{kase.case_number}"}
+            %td
+              %span.arrow
+            %td.status  
+              Sheriff Sale 
+              -if step.date > Time.now
+                Scheduled
+            %td
+              %table.table-nolines
+                %tr
+                  %td.date=step.date.strftime("%-m/%-d/%y")
+                  %td 
+                    This property is scheduled for public auction in the lobby of the Civil District Courthouse at 421 Loyola Ave.
+                    %br
+                    -unless step.status.nil?
+                      The status is
+                      %b=step.status
+
+        -when 'Maintenance'
+          %tr{:class => "case-history-resolution case-history-resolution-#{kase.case_number}"}
+            %td
+              %span.arrow
+            %td.status
+              Lot Cleared
+            %td
+              %table.table-nolines
+                %tr
+                  %td.date=step.date.strftime("%-m/%-d/%y")
+                  %td This lot was cleared by #{step.program_name}
+
+        -when 'Reset'
+          %tr{:class => "case-history-resolution case-history-resolution-#{kase.case_number}"}
+            %td
+              %span.arrow
+            %td.status
+              Case Reset
+            %td
+              %table.table-nolines
+                %tr
+                  %td.date=step.date.strftime("%-m/%-d/%y")
+                  %td The hearing for this case was reset.  A new hearing will be scheduled.
+        
         -else
-          %td 
-            %span.arrow            
-          %td.status 
-            %span
-              Inspected
-          %td
-            %table.table-nolines
-              %tr
-                %td.date=step.inspection_date.strftime("%-m/%-d/%y")
-                %td 
-                  Property was inspected
-                  -unless step.inspection_findings.first.nil?
-                    and was found with #{step.inspection_findings.count} violations. 
-                    %a{:id=>"see-violations", :href=>"#"}
-                      See Violations
-                    #list-of-violations
-                      -step.inspection_findings.each_with_index do |violation, index|
-                        %p  
-                          #{index+1}) #{violation.finding.gsub('HCEV', '')}
-      
-
-      -when 'Notification'
-        %tr{:class => "case-history-notification case-history-notification-#{kase.case_number}"}
-          %td
-            %span.arrow                                    
-          %td.status Notice Sent
-          %td
-            %table.table-nolines
-              %tr
-                %td.date=step.date.strftime("%-m/%-d/%y")
-                %td A notice of hearing was sent to the property owner.
-
-      -when 'Hearing'
-        %tr{:class => "case-history-#{step.class} case-history-#{step.class}-#{kase.case_number}"}
-          %td
-            %span.arrow                                    
-          %td.status 
-            #{step.date < Time.now ? 'Case Heard' : 'Hearing Scheduled'}
-          %td
-            %table.table-nolines
-              %tr
-                %td.date=step.date.strftime("%-m/%-d/%y")
-                %td The case against this property #{step.date > Time.now ? 'will be' : 'was'} heard 
-
-      -when 'Judgement'
-        %tr{:class => "case-history-#{step.class} case-history-#{step.class}-#{kase.case_number}"}
-          %td
-            %span.arrow                                    
-          %td.status 
-            Judgment Recorded
-          %td
-            %table.table-nolines
-              %tr
-                %td.date=step.date.strftime("%-m/%-d/%y")
-                %td
-                  -if step.status.nil? || step.status =~ /Guilty/
-                    A judgment of <b>#{step.status ? step.status.capitalize : 'Guilty'}</b> was reached
-                  -elsif step.status =~ /Closed/
-                    This case has been <b>Closed</b> #{"(#{step.notes})" if step.notes}
-                  -elsif step.status.downcase =~ /rescinded/
-                    The previous judgment for this case has been <b>rescinded</b>
-                  -else
-                    A judgment of <b>#{step.status}</b> was reached
-
-      -when 'Demolition'
-        %tr{:class => "case-history-resolution case-history-resolution-#{kase.case_number}"}
-          %td
-            %span.arrow
-          %td.status 
-            Demolition
-          %td
-            %table.table-nolines
-              %tr
-                %td.date=step.date.strftime("%-m/%-d/%y")
-                %td 
-                  This property was 
-                  -if step.program_name == "FEMA"
-                    demolished under by <b>FEMA</b>
-                  -elsif step.program_name == "NORA"
-                    sold to the state and demolished through the <b>Road Home</b> program
-                  -elsif step.program_name == "IDC"
-                    demolished because it was determined to be in <b>Imminent Danger of Collapse</b> 
-                  -elsif step.program_name == "SDER"
-                    demolished under the <b>City's Strategic Demolition</b> program
-                  -elsif step.program_name == "NOSD"
-                    demolished under the <b>City's Strategic Demolition</b> program
-                  -else
-                    demolished
-
-      -when 'Foreclosure'
-        %tr{:class => "case-history-resolution case-history-resolution-#{kase.case_number}"}
-          %td
-            %span.arrow
-          %td.status  
-            Sheriff Sale 
-            -if step.date > Time.now
-              Scheduled
-          %td
-            %table.table-nolines
-              %tr
-                %td.date=step.date.strftime("%-m/%-d/%y")
-                %td 
-                  This property is scheduled for public auction in the lobby of the Civil District Courthouse at 421 Loyola Ave.
-                  %br
-                  -unless step.status.nil?
-                    The status is
-                    %b=step.status
-
-      -when 'Maintenance'
-        %tr{:class => "case-history-resolution case-history-resolution-#{kase.case_number}"}
-          %td
-            %span.arrow
-          %td.status
-            Lot Cleared
-          %td
-            %table.table-nolines
-              %tr
-                %td.date=step.date.strftime("%-m/%-d/%y")
-                %td This lot was cleared by #{step.program_name}
-
-      -when 'Reset'
-        %tr{:class => "case-history-resolution case-history-resolution-#{kase.case_number}"}
-          %td
-            %span.arrow
-          %td.status
-            Case Reset
-          %td
-            %table.table-nolines
-              %tr
-                %td.date=step.date.strftime("%-m/%-d/%y")
-                %td The hearing for this case was reset.  A new hearing will be scheduled.
-      
-      -else
-        %tr{:class => "case-history-resolution case-history-resolution-#{kase.case_number}"}
-          %td
-            %span.arrow
-          %td.status
-            #{step.class}
-          %td
-            %table.table-nolines
-              %tr
-                %td.date=step.date.strftime("%-m/%-d/%y")
-                %td
+          %tr{:class => "case-history-resolution case-history-resolution-#{kase.case_number}"}
+            %td
+              %span.arrow
+            %td.status
+              #{step.class}
+            %td
+              %table.table-nolines
+                %tr
+                  %td.date=step.date.strftime("%-m/%-d/%y")
+                  %td

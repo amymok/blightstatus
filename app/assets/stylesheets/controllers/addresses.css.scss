@@ -170,10 +170,22 @@
         margin-bottom: 20px;
       }
 
+      .pull-right{
+
+        .label{
+          font-size: 15px;
+          padding: 5px;
+        }
+      }
+
+      .no-record-notice{
+        font-size: 106%;        
+      }
+
 
       h2{
         font-family: "Lato";
-        font-size: 150%;
+        font-size: 200%;
         font-weight: 300;
         text-align: left;  
 //        margin: 0 15px;
@@ -195,7 +207,7 @@
       color: #58595B;
       font-family: "Lato";   
       font-weight: 300;  
-      margin-top: 40px;
+      margin-top: 20px;
     }
 
     .status{
@@ -605,6 +617,8 @@
 
 .case {
   margin-top: 20px;
+  //  border-bottom: 1px solid #aaa;
+  margin-bottom: 60px;
 }
 
 .table-nolines th, .table-nolines td{

@@ -1,113 +1,132 @@
 .progress-bar-wrapper
-  %table.table
-    %thead
-      %tr
-        / %td
-        %td{:class=> 'property-status property-status-inspection'} Inspection
-        %td{:class=> 'property-status property-status-notification'} Notification
-        %td{:class=> 'property-status property-status-hearing'} Hearing
-        %td{:class=> 'property-status property-status-judgement'} Judgment
-        %td{:class=> 'property-status property-status-resolution'}  Resolution
-        %td{:style => "width: 20px"}
 
-    / =kase.case_steps
-    %tbody
-      -if kase.case_steps == 0 && kase.state == 'Open'
+  -if kase.is_enviromental_hazard?
+    %table.table
+      %thead
+        .no-record-notice
+          <b>Note:</b> While still relevant to City housing standards, Environment Hazard judgments cannot be enforced using the same measures as a more recent blight judgment.
+
+          / Button to trigger modal
+          %a{"data-toggle" => "modal", :href => "#myModal", :role => "button"} More Info >
+          / Modal
+          #myModal.modal.hide.fade{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
+            .modal-header
+              %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
+              %h2#myModalLabel About Environmental Hazard Cases
+            .modal-body{:style => "font-weight: lighter"}
+              %p
+                An Environmental Hazard Judgment was rendered for this property. While still relevant to City Code violations, this judgment does not apply to the Chapter 26 or 28 ordinances in the code regarding public nuisance and blight and cannot be enforced using the same measures as a more recent blight judgment. Further action by the City will generally require a new public nuisance or blight judgment.
+
+  -else
+    %table.table
+      %thead
         %tr
-          %td
-            .progress-arrow.pending{:style => "z-index: 14"}
-          %td
-            .progress-arrow.pending{:style => "z-index: 13"}
-          %td
-            .progress-arrow.pending{:style => "z-index: 12"}
-          %td
-            .progress-arrow.pending{:style => "z-index: 11"}
-          %td
-            .progress-arrow.resolution.pending{:style => "z-index: 10"}
-          %td
-      -elsif kase.case_steps == 0 && kase.state == 'Closed'
-        %tr
-          %td
-            .progress-arrow.error{:style => "z-index: 14"}
-          %td
-            .progress-arrow.error{:style => "z-index: 13"}
-          %td
-            .progress-arrow.error{:style => "z-index: 12"}
-          %td
-            .progress-arrow.error{:style => "z-index: 11"}
-          %td
-            .progress-arrow.resolution.error{:style => "z-index: 10"}
-          %td      
-      -else
-        %tr
-          %td
-            -unless kase.inspections.nil? || kase.inspections.empty? 
-              .progress-arrow.inspection{:class => "inspection-#{kase.case_number}", :style => "z-index: 14"}
-            -else
-              -if kase.missing_inspection?
-                .progress-arrow.error{:class => "inspection-#{kase.case_number}", :style => "z-index: 14"}
-              -elsif kase.state != 'Open'
-                .progress-arrow.error{:class => "inspection-#{kase.case_number}", :style => "z-index: 14"}
-              -else
-                .progress-arrow.pending{:class => "inspection-#{kase.case_number}", :style => "z-index: 14"}
+          / %td
+          %td{:class=> 'property-status property-status-inspection'} Inspection
+          %td{:class=> 'property-status property-status-notification'} Notification
+          %td{:class=> 'property-status property-status-hearing'} Hearing
+          %td{:class=> 'property-status property-status-judgement'} Judgment
+          %td{:class=> 'property-status property-status-resolution'}  Resolution
+          %td{:style => "width: 20px"}
 
-          %td
-            -unless kase.notifications.nil? || kase.notifications.empty?
-              .progress-arrow.notification{:class => "notification-#{kase.case_number}", :style => "z-index: 13"}
-            -else
-              -if kase.missing_notification?
-                .progress-arrow.error{:class => "notification-#{kase.case_number}", :style => "z-index: 13"}
-              -elsif kase.state != 'Open'
-                .progress-arrow.error{:class => "notification-#{kase.case_number}", :style => "z-index: 13"}
+      / =kase.case_steps
+      %tbody
+        -if kase.case_steps == 0 && kase.state == 'Open'
+          %tr
+            %td
+              .progress-arrow.pending{:style => "z-index: 14"}
+            %td
+              .progress-arrow.pending{:style => "z-index: 13"}
+            %td
+              .progress-arrow.pending{:style => "z-index: 12"}
+            %td
+              .progress-arrow.pending{:style => "z-index: 11"}
+            %td
+              .progress-arrow.resolution.pending{:style => "z-index: 10"}
+            %td
+        -elsif kase.case_steps == 0 && kase.state == 'Closed'
+          %tr
+            %td
+              .progress-arrow.error{:style => "z-index: 14"}
+            %td
+              .progress-arrow.error{:style => "z-index: 13"}
+            %td
+              .progress-arrow.error{:style => "z-index: 12"}
+            %td
+              .progress-arrow.error{:style => "z-index: 11"}
+            %td
+              .progress-arrow.resolution.error{:style => "z-index: 10"}
+            %td      
+        -else
+          %tr
+            %td
+              -unless kase.inspections.nil? || kase.inspections.empty? 
+                .progress-arrow.inspection{:class => "inspection-#{kase.case_number}", :style => "z-index: 14"}
               -else
-                .progress-arrow.pending{:class => "notification-#{kase.case_number}", :style => "z-index: 13"}
+                -if kase.missing_inspection?
+                  .progress-arrow.error{:class => "inspection-#{kase.case_number}", :style => "z-index: 14"}
+                -elsif kase.state != 'Open'
+                  .progress-arrow.error{:class => "inspection-#{kase.case_number}", :style => "z-index: 14"}
+                -else
+                  .progress-arrow.pending{:class => "inspection-#{kase.case_number}", :style => "z-index: 14"}
 
-          %td
-            -unless kase.hearings.empty?
-              -if kase.last_hearing.date > Time.now 
-                .progress-arrow.pending{:class => "hearing-#{kase.case_number}", :style => "z-index: 12"}
+            %td
+              -unless kase.notifications.nil? || kase.notifications.empty?
+                .progress-arrow.notification{:class => "notification-#{kase.case_number}", :style => "z-index: 13"}
               -else
-                .progress-arrow.hearing{:class => "hearing-#{kase.case_number}", :style => "z-index: 12"}
-            -else
-              -if kase.missing_hearing?
-                .progress-arrow.error{:class => "hearing-#{kase.case_number}", :style => "z-index: 12"}
-              -elsif kase.state != 'Open'
-                .progress-arrow.error{:class => "hearing-#{kase.case_number}", :style => "z-index: 12"}
-              -else
-                .progress-arrow.pending{:class => "hearing-#{kase.case_number}", :style => "z-index: 12"}
+                -if kase.missing_notification?
+                  .progress-arrow.error{:class => "notification-#{kase.case_number}", :style => "z-index: 13"}
+                -elsif kase.state != 'Open'
+                  .progress-arrow.error{:class => "notification-#{kase.case_number}", :style => "z-index: 13"}
+                -else
+                  .progress-arrow.pending{:class => "notification-#{kase.case_number}", :style => "z-index: 13"}
 
-          %td
-            -unless kase.judgement.nil?
-              .progress-arrow.judgement{:class => "judgement-#{kase.case_number}", :style => "z-index: 11"}
-            -else
-              -if kase.missing_judgement?
-                .progress-arrow.error{:class => "judgement-#{kase.case_number}", :style => "z-index: 11"}
-              -elsif kase.state != 'Open'
-                .progress-arrow.error{:class => "judgement-#{kase.case_number}", :style => "z-index: 11"}
+            %td
+              -unless kase.hearings.empty?
+                -if kase.last_hearing.date > Time.now 
+                  .progress-arrow.pending{:class => "hearing-#{kase.case_number}", :style => "z-index: 12"}
+                -else
+                  .progress-arrow.hearing{:class => "hearing-#{kase.case_number}", :style => "z-index: 12"}
               -else
-                .progress-arrow.pending{:class => "judgement-#{kase.case_number}", :style => "z-index: 11"}
+                -if kase.missing_hearing?
+                  .progress-arrow.error{:class => "hearing-#{kase.case_number}", :style => "z-index: 12"}
+                -elsif kase.state != 'Open'
+                  .progress-arrow.error{:class => "hearing-#{kase.case_number}", :style => "z-index: 12"}
+                -else
+                  .progress-arrow.pending{:class => "hearing-#{kase.case_number}", :style => "z-index: 12"}
 
-          %td
-            -if kase.resolutions.any?
-              -if kase.resolutions.first.date > Time.now
-                .progress-arrow.resolution.loading{:class => "resolution-#{kase.case_number}", :style => "z-index: 10"}
+            %td
+              -unless kase.judgement.nil?
+                .progress-arrow.judgement{:class => "judgement-#{kase.case_number}", :style => "z-index: 11"}
               -else
-                .progress-arrow.resolution{:class => "resolution-#{kase.case_number}", :style => "z-index: 10"}
-            -else
-              -if kase.missing_resolution?
-                .progress-arrow.resolution.error{:class => "resolution-#{kase.case_number}", :style => "z-index: 10"}
-              -elsif kase.state != 'Open'
-                .progress-arrow.resolution.error{:class => "resolution-#{kase.case_number}", :style => "z-index: 10"}
+                -if kase.missing_judgement?
+                  .progress-arrow.error{:class => "judgement-#{kase.case_number}", :style => "z-index: 11"}
+                -elsif kase.state != 'Open'
+                  .progress-arrow.error{:class => "judgement-#{kase.case_number}", :style => "z-index: 11"}
+                -else
+                  .progress-arrow.pending{:class => "judgement-#{kase.case_number}", :style => "z-index: 11"}
+
+            %td
+              -if kase.resolutions.any?
+                -if kase.resolutions.first.date > Time.now
+                  .progress-arrow.resolution.loading{:class => "resolution-#{kase.case_number}", :style => "z-index: 10"}
+                -else
+                  .progress-arrow.resolution{:class => "resolution-#{kase.case_number}", :style => "z-index: 10"}
               -else
-                .progress-arrow.resolution.pending{:class => "resolution-#{kase.case_number}", :style => "z-index: 10"}
-          %td
-        %hr.soften
-  -if kase.case_data_error?
-    %p{:style => "text-align: center; padding: 0 0 10px; margin:0 auto;"}
-      %b{:style => "color: red"}
-        Warning:
-      This case is missing steps. 
-      =link_to('#why-data-incomplete', "data-animation" => "true", :trigger => "hover", :delay => 100, "data-placement"=>"bottom", :rel=>"tooltip", "data-toggle"=>"modal", "data-title"=>"Receive notifications when the status of this property changes") do
-        Why?
+                -if kase.missing_resolution?
+                  .progress-arrow.resolution.error{:class => "resolution-#{kase.case_number}", :style => "z-index: 10"}
+                -elsif kase.state != 'Open'
+                  .progress-arrow.resolution.error{:class => "resolution-#{kase.case_number}", :style => "z-index: 10"}
+                -else
+                  .progress-arrow.resolution.pending{:class => "resolution-#{kase.case_number}", :style => "z-index: 10"}
+            %td
+          %hr.soften
+    -if kase.case_data_error?
+      %p{:style => "text-align: center; padding: 0 0 10px; margin:0 auto;"}
+        %b{:style => "color: red"}
+          Warning:
+        This case is missing steps. 
+        =link_to('#why-data-incomplete', "data-animation" => "true", :trigger => "hover", :delay => 100, "data-placement"=>"bottom", :rel=>"tooltip", "data-toggle"=>"modal", "data-title"=>"Receive notifications when the status of this property changes") do
+          Why?
 
 
