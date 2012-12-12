@@ -12,7 +12,7 @@ describe Account do
       @subscription = FactoryGirl.create(:subscription)
       kase = FactoryGirl.create(:case)
       @subscription.address.cases << kase
-      FactoryGirl.create(:inspection, :case_number => kase.case_number)
+      FactoryGirl.create(:inspection, :case_number => kase.case_number, :inspection_date => (DateTime.now + 1.day))
       @subscription.account.send_digest
       Delayed::Job.count.should eq(1)
     end
