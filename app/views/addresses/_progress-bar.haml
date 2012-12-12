@@ -7,15 +7,25 @@
           <b>Note:</b> While still relevant to City housing standards, Environment Hazard judgments cannot be enforced using the same measures as a more recent blight judgment.
 
           / Button to trigger modal
-          %a{"data-toggle" => "modal", :href => "#myModal", :role => "button"} More Info >
+          %a{"data-toggle" => "modal", :href => "#environmental-hazard-cases", :role => "button"} More Info >
           / Modal
-          #myModal.modal.hide.fade{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
+          #environmental-hazard-cases.modal.hide.fade{"aria-hidden" => "true", "aria-labelledby" => "environmental-hazard-cases-label", :role => "dialog", :tabindex => "-1"}
             .modal-header
               %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
-              %h2#myModalLabel About Environmental Hazard Cases
-            .modal-body{:style => "font-weight: lighter"}
+              %h2#environmental-hazard-cases-label About Environmental Hazard Cases
+            .modal-body
               %p
-                An Environmental Hazard Judgment was rendered for this property. While still relevant to City Code violations, this judgment does not apply to the Chapter 26 or 28 ordinances in the code regarding public nuisance and blight and cannot be enforced using the same measures as a more recent blight judgment. Further action by the City will generally require a new public nuisance or blight judgment.
+                Our data about <b>inspections</b>, <b>notifications</b>, <b>hearings</b>, and <b>judgments</b> comes directly from the City of New Orleans' internal land management system, called LAMA. We refresh this data every 10 minutes.
+              %p
+                Data about <b>resolutions</b> comes from a few different sources: 
+              %p
+                We pull <b>demolition</b> data from a spreadsheet on New Orleans' open data portal, <a href="http://data.nola.gov">data.nola.gov</a>. We refresh this data monthly, to reflect the City's update schedule for demolition data. 
+              %p
+                Data about <b>foreclosures</b> and Sheriff sales comes directly from the internal data management system of the Orleans Parish Sheriff's Office. We refresh this data daily.
+
+            .modal-footer
+              %button.btn.btn-primary{"aria-hidden" => "true", "data-dismiss" => "modal"} Return to Website
+
 
   -else
     %table.table
