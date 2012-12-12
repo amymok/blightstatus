@@ -56,7 +56,7 @@
                     311
           -else
             -@address.cases_sorted_by_state.each do |c|
-              .case{:class => "case-status-#{c.state}".downcase}
+              .case{:class => "case-status-#{c.state} case-type-#{c.case_number.match(/(^[A-z]+)/)}".downcase}
                 %h2
                   Case:
                   =c.case_number

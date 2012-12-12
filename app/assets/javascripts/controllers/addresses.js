@@ -40,6 +40,11 @@ OpenBlight.addresses = {
       $('.case').first().show();
     }
 
+    // if($('.case-type-envhadj').length){
+    //   $('.case-type-envhadj').hide();
+    // }
+
+
 
 
   },
