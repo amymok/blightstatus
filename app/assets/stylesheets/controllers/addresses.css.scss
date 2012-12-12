@@ -408,10 +408,13 @@
 
 @include faq-mixin;
 
-.view-all-faq{
-  font-size: $largeFontSize;
-  text-align: left;
-  margin-left: 35px;
+.question-list {
+  h4{
+
+    text-align: left;
+    margin-left: 35px;
+    font-size: $largeFontSize; 
+  }
 }
 
 
