@@ -134,7 +134,7 @@
                   %td A notice of hearing was sent to the property owner.
 
         -when 'Hearing'
-          -if kase.judgement.nil? || (kase.judgement && step.date == kase.judgement.date)
+          -if kase.judgement.nil? || (kase.judgement && step.date != kase.judgement.date)
             %tr{:class => "case-history-#{step.class} case-history-#{step.class}-#{kase.case_number}"}
               %td
                 %span.arrow                                    
