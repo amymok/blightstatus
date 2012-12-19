@@ -22,11 +22,16 @@ Or, if you'd like to contribute to this project, read on!
 [![Dependency Status](https://gemnasium.com/codeforamerica/blightstatus.png)](https://gemnasium.com/codeforamerica/blightstatus)
 [gemnasium]: https://gemnasium.com/codeforamerica/blightstatus
 
+
+## <a name="build"></a>RubyDoc
+You can read our automatically generated documented at 
+[http://www.rubydoc.info/github/codeforamerica/blightstatus/frames][RubyDoc].
+
+
 ## <a name="demo"></a>Demo
 You can see a live instance of BlightStatus running at 
 [http://blightstatus.nola.gov/][demo].
 
-[demo]: http://blightstatus.nola.gov
 
 ## <a name="installation"></a>Installation
 
@@ -79,11 +84,6 @@ Here are some ways *you* can contribute:
 * by refactoring code
 * by closing [issues][]
 * by reviewing patches
-* [financially][]
-
-[locales]: https://github.com/codeforamerica/cfa_template/tree/master/config/locales
-[issues]: https://github.com/codeforamerica/cfa_template/issues
-[financially]: https://secure.codeforamerica.org/page/contribute
 
 ## <a name="issues"></a>Submitting an Issue
 We use the [GitHub issue tracker][issues] to track bugs and features. Before
@@ -136,4 +136,3 @@ Copyright (c) 2012 Code for America. See [LICENSE][] for details.
 
 [![Code for America Tracker](http://stats.codeforamerica.org/codeforamerica/cfa_template.png)][tracker]
 
-[tracker]: http://stats.codeforamerica.org/projects/openblight

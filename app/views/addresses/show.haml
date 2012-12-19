@@ -130,7 +130,7 @@
           - else 
             =render "pages/help/questions/general"
 
-        .view-all-faq
+        %h4.view-all-faq
           =link_to "View All Questions >", "/pages/help"
 
 
@@ -146,15 +146,15 @@
             %li City of New Orleans Permits & Licensing system
             %li City of New Orleans & Road Home Program <a href="https://data.nola.gov/Administrative-Data/BlightStat-Demolitions/abvi-rghr">demolition data</a>
             %li <a href="http://civilsheriff.com/">Orleans Parish Sheriff</a>’s foreclosure data
-        .view-all-faq
+        %h4.view-all-faq
           / Button to trigger modal
-          %a{"data-toggle" => "modal", :href => "#myModal", :role => "button"} More Info >
+          %a{"data-toggle" => "modal", :href => "#view-all-faq", :role => "button"} More Info >
           / Modal
-          #myModal.modal.hide.fade{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
+          #view-all-faq.modal.hide.fade{"aria-hidden" => "true", "aria-labelledby" => "view-all-faq-label", :role => "dialog", :tabindex => "-1"}
             .modal-header
               %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
-              %h2#myModalLabel Data Sources
-            .modal-body{:style => "font-weight: lighter"}
+              %h2#view-all-faq-label Data Sources
+            .modal-body
               %p
                 Our data about <b>inspections</b>, <b>notifications</b>, <b>hearings</b>, and <b>judgments</b> comes directly from the City of New Orleans' internal land management system, called LAMA. We refresh this data every 10 minutes.
               %p
