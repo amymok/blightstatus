@@ -147,7 +147,7 @@
                   %tr
                     %td.date=step.date.strftime("%-m/%-d/%y")
                     %td
-                      The case against this property was heard 
+                      The case against this property was heard<br/> 
                       -if step.status.nil? || step.status =~ /Guilty/
                         A judgment of <b>#{step.status ? step.status.capitalize : 'Guilty'}</b> was reached
                       -elsif step.status =~ /Closed/
