@@ -51,6 +51,10 @@ GEM
       mime-types
       xml-simple
     bcrypt-ruby (3.0.1)
+    better_errors (0.2.0)
+      coderay (>= 1.0.0)
+      erubis (>= 2.7.0)
+    binding_of_caller (0.6.8)
     bourne (1.1.2)
       mocha (= 0.10.5)
     builder (3.0.4)
@@ -156,6 +160,7 @@ GEM
     multi_json (1.5.0)
     multi_xml (0.5.1)
     multipart-post (1.1.5)
+    newrelic_rpm (3.5.3.25)
     newrelic_rpm (3.5.4.33)
     nokogiri (1.5.5)
     nori (2.0.0)
@@ -312,7 +317,7 @@ DEPENDENCIES
   jquery-rails
   kaminari
   lama!
-  newrelic_rpm
+  newrelic_rpm (= 3.5.3.25)
   pg
   rails (= 3.2.9)
   rails3-jquery-autocomplete
