@@ -5,35 +5,35 @@
 
     -if kase.is_enviromental_hazard?
 
-      -kase.history.each do |step|
-        -case step.class.to_s
-        -when 'Inspection'
-          %tr{:class => "case-history-inspection case-history-inspection-#{kase.case_number}"}
-            %td 
-              %span.arrow            
-            %td.status 
-              %span
-                Inspected
-            %td
-              %table.table-nolines
-                %tr
-                  %td.date=step.inspection_date.strftime("%-m/%-d/%y")
-                  %td 
-                    Property was inspected
-        -when 'Judgement'
-          %tr{:class => "case-history-inspection case-history-inspection-#{kase.case_number}"}
-            %td 
-              %span.arrow            
-            %td.status 
-              %span
-                Judgment Posted
-            %td
-              %table.table-nolines
-                %tr
-                  %td.date
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  %td 
-                    The judgment for this case was posted
+      -kase.inspections.sort{|a,b| a.date <=> b.date}.each do |step|
+        %tr{:class => "case-history-inspection case-history-inspection-#{kase.case_number}"}
+          %td 
+            %span.arrow            
+          %td.status 
+            %span
+              Inspected
+          %td
+            %table.table-nolines
+              %tr
+                %td.date=step.inspection_date.strftime("%-m/%-d/%y")
+                %td 
+                  Property was inspected
+      -if kase.judgement
+        %tr{:class => "case-history-inspection case-history-inspection-#{kase.case_number}"}
+          %td 
+            %span.arrow            
+          %td.status 
+            %span
+              Case Heard
+          %td
+            %table.table-nolines
+              %tr
+                %td.date
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                %td 
+                  The case against this property was heard
+                  -if kase.judgement.status
+                    and an outcome of <b>#{kase.judgement.status.capitalize}</b> was reached
 
 
     -else
@@ -123,36 +123,39 @@
                   %td A notice of hearing was sent to the property owner.
 
         -when 'Hearing'
-          %tr{:class => "case-history-#{step.class} case-history-#{step.class}-#{kase.case_number}"}
-            %td
-              %span.arrow                                    
-            %td.status 
-              #{step.date < Time.now ? 'Case Heard' : 'Hearing Scheduled'}
-            %td
-              %table.table-nolines
-                %tr
-                  %td.date=step.date.strftime("%-m/%-d/%y")
-                  %td The case against this property #{step.date > Time.now ? 'will be' : 'was'} heard 
+          -unless step.date == kase.judgement.date
+            %tr{:class => "case-history-#{step.class} case-history-#{step.class}-#{kase.case_number}"}
+              %td
+                %span.arrow                                    
+              %td.status 
+                #{step.date < Time.now ? 'Case Heard' : 'Hearing Scheduled'}
+              %td
+                %table.table-nolines
+                  %tr
+                    %td.date=step.date.strftime("%-m/%-d/%y")
+                    %td The case against this property #{step.date > Time.now ? 'will be' : 'was'} heard 
 
         -when 'Judgement'
-          %tr{:class => "case-history-#{step.class} case-history-#{step.class}-#{kase.case_number}"}
-            %td
-              %span.arrow                                    
-            %td.status 
-              Judgment Recorded
-            %td
-              %table.table-nolines
-                %tr
-                  %td.date=step.date.strftime("%-m/%-d/%y")
-                  %td
-                    -if step.status.nil? || step.status =~ /Guilty/
-                      A judgment of <b>#{step.status ? step.status.capitalize : 'Guilty'}</b> was reached
-                    -elsif step.status =~ /Closed/
-                      This case has been <b>Closed</b> #{"(#{step.notes})" if step.notes}
-                    -elsif step.status.downcase =~ /rescinded/
-                      The previous judgment for this case has been <b>rescinded</b>
-                    -else
-                      A judgment of <b>#{step.status}</b> was reached
+          -if step == kase.judgement
+            %tr{:class => "case-history-#{step.class} case-history-#{step.class}-#{kase.case_number}"}
+              %td
+                %span.arrow                                    
+              %td.status 
+                Case Heard
+              %td
+                %table.table-nolines
+                  %tr
+                    %td.date=step.date.strftime("%-m/%-d/%y")
+                    %td
+                      The case against this property was heard 
+                      -if step.status.nil? || step.status =~ /Guilty/
+                        A judgment of <b>#{step.status ? step.status.capitalize : 'Guilty'}</b> was reached
+                      -elsif step.status =~ /Closed/
+                        This case has been <b>Closed</b> #{"(#{step.notes})" if step.notes}
+                      -elsif step.status.downcase =~ /rescinded/
+                        The previous judgment for this case has been <b>rescinded</b>
+                      -else
+                        A judgment of <b>#{step.status}</b> was reached
 
         -when 'Demolition'
           %tr{:class => "case-history-resolution case-history-resolution-#{kase.case_number}"}
