@@ -29,11 +29,22 @@
             %table.table-nolines
               %tr
                 %td.date
-                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  -if kase.judgement.date.strftime("%-m/%-d/%y") == "4/10/09"
+                    Date Not Available
+                  -else
+                    #{kase.judgement.date.strftime("%-m/%-d/%y")}
                 %td 
-                  The case against this property was heard
-                  -if kase.judgement.status
-                    and an outcome of <b>#{kase.judgement.status.capitalize}</b> was reached
+                  -if kase.judgement.status =~ /Guilty/
+                    A judgment of <b>#{kase.judgement.status ? kase.judgement.status.capitalize : 'Guilty'}</b> was reached
+                  -elsif kase.judgement.status =~ /Closed/
+                    This case has been <b>Closed</b> #{"(#{kase.judgement.notes})" if kase.judgement.notes}
+                  -elsif kase.judgement.status.downcase =~ /rescinded/
+                    The previous judgment for this case has been <b>rescinded</b>
+                  -elsif kase.judgement.status
+                    A judgment of <b>#{kase.judgement.status}</b> was reached
+                  -else
+                    The case against this property was heard 
+                  
 
 
     -else
@@ -147,7 +158,6 @@
                   %tr
                     %td.date=step.date.strftime("%-m/%-d/%y")
                     %td
-                      The case against this property was heard<br/> 
                       -if step.status.nil? || step.status =~ /Guilty/
                         A judgment of <b>#{step.status ? step.status.capitalize : 'Guilty'}</b> was reached
                       -elsif step.status =~ /Closed/
