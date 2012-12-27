@@ -63,8 +63,27 @@ module ImportHelpers
   end
 
   # unzip files
-  def get_shapefile_from_remote_zipfile ( url )
-    #zipfile = download_from_http( url )
+  def get_geojson_from_shapefile_zip ( remote_shapefile )
+
+    local_cache_address_file = "#{Rails.root}" + '/tmp/cache/NOLA_Addresses_20121214.zip'
+
+    p "Downloading Shapefile...."
+    # File.open(local_cache_address_file, "wb") do |saved_file|
+    #   open(remote_shapefile, 'rb') do |read_download_file|
+    #     saved_file.write(read_download_file.read)
+    #   end
+    # end
+    p "Complete"
+
+
+    #post the zip shape file to get geojson
+    p "Converting Shapefile to GeoJSON..."
+    response = RestClient.post 'http://0.0.0.0:5000/', :file => File.new(local_cache_address_file, 'rb')
+    p "Complete"
+
+    JSON.parse(response.body)
+
+
   end
 
 
@@ -75,5 +94,7 @@ module ImportHelpers
     downloaded_geojson = File.read(downloaded_file_path)
     JSON.parse(downloaded_geojson)
   end
+
+
 
 end
