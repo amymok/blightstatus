@@ -14,6 +14,9 @@ gem 'docsplit'
 gem 'rubyXL'
 gem 'devise'
 gem 'devise-async'
+gem 'redirect_follower'
+gem "rest-client", :git => 'git://github.com/rest-client/rest-client.git'
+
 
 gem 'lama', :git => 'https://github.com/gangleton/lama.git'
 gem 'savon'
