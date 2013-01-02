@@ -329,7 +329,7 @@ module LAMAHelpers
       last_hearing = kase.last_hearing
       h = Hearing.new(:case_number => kase.case_number, :hearing_date => event.DateEvent, :hearing_status => event.Status, :hearing_type => event.Type, :is_complete => false)
       h.spawn_id = event.SpawnID.to_i if event.SpawnID != '-1'
-      h.save if kase.judgement.nil? && last_notification && h.date > last_notification.date && (last_hearing.nil? || ((last_hearing && h.date > last_hearing.date) && (last_notification > last_hearing.date)))         
+      h.save if kase.judgement.nil? && last_notification && h.date > last_notification.date && (last_hearing.nil? || ((last_hearing && h.date > last_hearing.date) && (last_notification.date > last_hearing.date)))         
     end
   end
   def parseInspection(case_number,inspection)
