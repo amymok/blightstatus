@@ -326,4 +326,8 @@
   def history
     accela_steps.sort{|a, b| a.date <=> b.date}
   end
+
+  def load_case
+    LAMAHelpers.load_case(self.case_number)
+  end
 end

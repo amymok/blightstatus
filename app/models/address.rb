@@ -157,4 +157,8 @@ class Address < ActiveRecord::Base
     status = most_recent_status
     status ? status.case : nil
   end
+
+  def load_open_cases
+    self.cases.select{|kase| kase.state.downcase =~ /open/}.each{|kase| kase.load_case}
+  end
 end
