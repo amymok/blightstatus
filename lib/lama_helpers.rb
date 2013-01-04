@@ -218,7 +218,12 @@ module LAMAHelpers
       elsif event.Type =~ /Inspection/ || event.Name =~ /Inspection/ || event.Type =~ /Reinspection/ || event.Name =~ /Reinspection/
         if event.SpawnID && event.SpawnID != '-1' && spawn_hash[event.SpawnID]
           unless Inspection.where("case_number = '#{kase.case_number}' and (inspection_date >= '#{date.beginning_of_day.to_formatted_s(:db)}' and inspection_date <= '#{date.end_of_day.to_formatted_s(:db)}')").exists?
-            Inspection.create(:case_number => kase.case_number, :inspection_date => spawn_hash[event.SpawnID][:date], :notes => spawn_hash[event.SpawnID][:notes], :result => event.Status, :spawn_id => event.SpawnID.to_i)
+            i = Inspection.create(:case_number => kase.case_number, :inspection_date => spawn_hash[event.SpawnID][:date], :notes => spawn_hash[event.SpawnID][:notes], :result => event.Status, :spawn_id => event.SpawnID.to_i)
+            if spawn_hash[event.SpawnID][:findings]
+              spawn_hash[event.SpawnID][:findings].each do |key,finding|
+                i.inspection_findings.create(:label => finding[:label], :finding => finding[:finding])
+              end
+            end
           end
           spawn_hash.delete(event.SpawnID)
         else          
@@ -475,7 +480,7 @@ module LAMAHelpers
     cases
   end
   
-    def import_unsaved_cases_by_location(address,lama=nil)
+  def import_unsaved_cases_by_location(address,lama=nil)
     begin
       lama = LAMA.new({ :login => ENV['LAMA_EMAIL'], :pass => ENV['LAMA_PASSWORD']}) if lama.nil?
     
@@ -558,7 +563,12 @@ module LAMAHelpers
           Judgement.create(:case_number => kase.case_number, :notes => spawn[:notes], :judgement_date => spawn[:date], :status => spawn[:status])# unless Judgement.where("case_number = '#{kase.case_number}' and (judgement_date >= '#{DateTime.parse(spawn[:date]).beginning_of_day.to_formatted_s(:db)}' and judgement_date <= '#{DateTime.parse(spawn[:date]).end_of_day.to_formatted_s(:db)}')").exists?
         end
       elsif spawn[:step] == Inspection.to_s
-        Inspection.create(:case_number => kase.case_number, :inspection_date => spawn[:date], :notes => spawn[:notes]) unless Inspection.where("case_number = '#{kase.case_number}' and (inspection_date >= '#{DateTime.parse(spawn[:date]).beginning_of_day.to_formatted_s(:db)}' and inspection_date <= '#{DateTime.parse(spawn[:date]).end_of_day.to_formatted_s(:db)}')").exists?
+        i = Inspection.create(:case_number => kase.case_number, :inspection_date => spawn[:date], :notes => spawn[:notes]) unless Inspection.where("case_number = '#{kase.case_number}' and (inspection_date >= '#{DateTime.parse(spawn[:date]).beginning_of_day.to_formatted_s(:db)}' and inspection_date <= '#{DateTime.parse(spawn[:date]).end_of_day.to_formatted_s(:db)}')").exists?
+        if spawn[:findings]
+              spawn_hash[event.SpawnID][:findings].each do |key,finding|
+                i.inspection_findings.create(:label => finding[:label], :finding => finding[:finding])
+              end
+            end
       elsif spawn[:step] == Notification.to_s
         Notification.create(:case_number => kase.case_number, :notified => spawn[:date], :notification_type => spawn[:notes]) unless Notification.where("case_number = '#{kase.case_number}' and (notified >= '#{DateTime.parse(spawn[:date]).beginning_of_day.to_formatted_s(:db)}' and notified <= '#{DateTime.parse(spawn[:date]).end_of_day.to_formatted_s(:db)}')").exists?
       elsif spawn[:step] == Complaint.to_s
@@ -581,6 +591,7 @@ module LAMAHelpers
     if kase
       puts "destroying => #{case_number}"
       kase.complaint.destroy if kase.complaint
+      kase.inspections.each{|i| i.inspection_findings.destroy_all}
       kase.inspections.destroy_all
       kase.notifications.destroy_all
       kase.hearings.destroy_all
