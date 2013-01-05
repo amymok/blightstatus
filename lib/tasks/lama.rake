@@ -297,10 +297,14 @@ namespace :lama do
   desc "reload cases imported without spawn"
   task :load_open_cases => :environment do |t, args|
     l = LAMA.new({:login => ENV['LAMA_EMAIL'], :pass => ENV['LAMA_PASSWORD']})
-    puts "#{Case.where(:state => 'Open').count} Open Cases as of #{DateTime.now}"
+    total = Case.where(:state => 'Open').count
+    puts "#{total.to_s} Open Cases as of #{DateTime.now}"
+    i = 1
     Case.where(:state => 'Open').find_each do |kase|
+      puts "#{i.to_s} of #{total.to_s}: #{kase.case_number} loading attempted at #{DateTime.now}"
       LAMAHelpers.load_case(kase.case_number,l)
-      puts "#{kase.case_number} loaded"
+      puts "#{i.to_s} of #{total.to_s}: #{kase.case_number} loaded"
+      i+=1
     end 
   end
 end

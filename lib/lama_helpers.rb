@@ -238,7 +238,7 @@ module LAMAHelpers
           end
           spawn_hash.delete(event.SpawnID)
         else
-          unless Complaint.where("case_number = '#{kase.case_number}' and (date_received >= '#{c.date.beginning_of_day.to_formatted_s(:db)}' and date_received <= '#{c.date.end_of_day.to_formatted_s(:db)}')").exists?
+          unless Complaint.where("case_number = '#{kase.case_number}' and (date_received >= '#{date.beginning_of_day.to_formatted_s(:db)}' and date_received <= '#{date.end_of_day.to_formatted_s(:db)}')").exists?
             Complaint.create(:case_number => kase.case_number, :date_received => event.DateEvent, :status => event.Status)
           end
         end
@@ -325,12 +325,12 @@ module LAMAHelpers
             spawn_hash.delete(event.SpawnID)
           else
             puts "spawn id => #{event.SpawnID}"
-            unless Judgement.where("case_number = '#{kase.case_number}' and (judgement_date >= '#{j.date.beginning_of_day.to_formatted_s(:db)}' and judgement_date <= '#{j.date.end_of_day.to_formatted_s(:db)}')").exists?
+            unless Judgement.where("case_number = '#{kase.case_number}' and (judgement_date >= '#{date.beginning_of_day.to_formatted_s(:db)}' and judgement_date <= '#{date.end_of_day.to_formatted_s(:db)}')").exists?
               Judgement.create(:case_number => kase.case_number, :notes => notes, :status => j_status, :judgement_date => event.DateEvent)
             end
           end
-          unless Hearing.where("case_number = '#{kase.case_number}' and (hearing_date >= '#{j.date.beginning_of_day.to_formatted_s(:db)}' and hearing_date <= '#{j.date.end_of_day.to_formatted_s(:db)}')").exists?
-            Hearing.create(:case_number => kase.case_number, :hearing_date => j.date, :hearing_status => j_status, :hearing_type => event.Type, :is_complete => true, :spawn_id => event.SpawnID.to_i) 
+          unless Hearing.where("case_number = '#{kase.case_number}' and (hearing_date >= '#{date.beginning_of_day.to_formatted_s(:db)}' and hearing_date <= '#{date.end_of_day.to_formatted_s(:db)}')").exists?
+            Hearing.create(:case_number => kase.case_number, :hearing_date => date, :hearing_status => j_status, :hearing_type => event.Type, :is_complete => true, :spawn_id => event.SpawnID.to_i) 
           end
           kase.outcome = j_status
         else
