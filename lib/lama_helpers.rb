@@ -503,8 +503,10 @@ module LAMAHelpers
   def get_incident_division_by_location(lama,location,case_number)
     begin
       incidents = incidents_by_location(location,lama)
-      incidents.each do |incident|
-          return incident.Division if incident.Number == case_number
+      if incidents
+        incidents.each do |incident|
+            return incident.Division if incident.Number == case_number
+        end
       end
     rescue StandardError => ex
       puts "There was an error of type #{ex.class}, with a message of #{ex.message}"
@@ -554,9 +556,9 @@ module LAMAHelpers
   end
 
   def remainingSpawns(kase,spawnHash)
-    puts "Remaining SpawnHash => #{spawnHash.inspect}"
+    # puts "Remaining SpawnHash => #{spawnHash.inspect}"
     spawnHash.each do |spawn_id,spawn|
-      puts "spawn => #{spawn.inspect}"
+      # puts "spawn => #{spawn.inspect}"
       if spawn[:step] == Judgement.to_s
         unless Judgement.where("case_number = '#{kase.case_number}' and (judgement_date >= '#{DateTime.parse(spawn[:date]).beginning_of_day.to_formatted_s(:db)}' and judgement_date <= '#{DateTime.parse(spawn[:date]).end_of_day.to_formatted_s(:db)}')").exists?
           Hearing.create(:case_number => kase.case_number, :hearing_date => spawn[:date], :hearing_status => spawn[:status], :hearing_type => spawn[:notes], :is_complete => true) unless Hearing.where("case_number = '#{kase.case_number}' and (hearing_date >= '#{DateTime.parse(spawn[:date]).beginning_of_day.to_formatted_s(:db)}' and hearing_date <= '#{DateTime.parse(spawn[:date]).end_of_day.to_formatted_s(:db)}')").exists?
@@ -564,11 +566,11 @@ module LAMAHelpers
         end
       elsif spawn[:step] == Inspection.to_s
         i = Inspection.create(:case_number => kase.case_number, :inspection_date => spawn[:date], :notes => spawn[:notes]) unless Inspection.where("case_number = '#{kase.case_number}' and (inspection_date >= '#{DateTime.parse(spawn[:date]).beginning_of_day.to_formatted_s(:db)}' and inspection_date <= '#{DateTime.parse(spawn[:date]).end_of_day.to_formatted_s(:db)}')").exists?
-        if spawn[:findings]
-              spawn_hash[event.SpawnID][:findings].each do |key,finding|
-                i.inspection_findings.create(:label => finding[:label], :finding => finding[:finding])
-              end
-            end
+        if i && spawn[:findings]
+          spawn[:findings].each do |key,finding|
+            i.inspection_findings.create(:label => finding[:label], :finding => finding[:finding])
+          end
+        end
       elsif spawn[:step] == Notification.to_s
         Notification.create(:case_number => kase.case_number, :notified => spawn[:date], :notification_type => spawn[:notes]) unless Notification.where("case_number = '#{kase.case_number}' and (notified >= '#{DateTime.parse(spawn[:date]).beginning_of_day.to_formatted_s(:db)}' and notified <= '#{DateTime.parse(spawn[:date]).end_of_day.to_formatted_s(:db)}')").exists?
       elsif spawn[:step] == Complaint.to_s
@@ -607,11 +609,16 @@ module LAMAHelpers
 
   def load_case(case_number, client=nil)
     loaded = false
-    client = LAMA.new({:login => ENV['LAMA_EMAIL'], :pass => ENV['LAMA_PASSWORD']}) unless client
-    incident = client.incident(case_number)
-    if incident && incident.Type == 'Public Nuisance and Blight' 
-      import_incident_to_database(incident,client)
-      loaded = Case.where(:case_number => case_number).any?
+    begin
+      client = LAMA.new({:login => ENV['LAMA_EMAIL'], :pass => ENV['LAMA_PASSWORD']}) unless client
+      incident = client.incident(case_number)
+      if incident && incident.Type == 'Public Nuisance and Blight' 
+        import_incident_to_database(incident,client)
+        loaded = Case.where(:case_number => case_number).any?
+      end
+    rescue StandardError => ex
+      puts "There was an error of type #{ex.class}, with a message of #{ex.message}"
+      puts "Backtrace => #{ex.backtrace}"
     end
     loaded
   end
