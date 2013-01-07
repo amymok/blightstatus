@@ -19,7 +19,9 @@ class AddressesController < ApplicationController
       @account = current_account
       @account_subscribed = !@account.subscriptions.where(:address_id => params[:id]).empty?
     end
+    
     @address = Address.find(params[:id])
+    @address.load_open_cases
 
     # if APP_CONFIG['demo_page_id'] == @address.id
     #   render :action => 'show-demo'
