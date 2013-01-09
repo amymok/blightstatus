@@ -21,9 +21,8 @@
           -else
             demolished
 
-
-          on
-          %b=d.first.date_completed.strftime("%-m/%-d/%y")
+          -if d.first.date_completed
+            on <b>#{d.first.date_completed.strftime("%-m/%-d/%y")}</b>
 
       -address.foreclosures.each do |d|
         %li
