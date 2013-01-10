@@ -15,6 +15,16 @@ class Demolition < ActiveRecord::Base
     end
   end
 
+  after_destroy do
+    if self.case
+      self.case.update_last_status
+    else
+      if self.address
+        self.address.latest_status
+      end
+    end
+  end
+
   def date
     self.date_completed || self.date_started || DateTime.new(0)
   end
