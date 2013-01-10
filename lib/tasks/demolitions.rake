@@ -121,12 +121,18 @@ namespace :demolitions do
 
   desc "Downloading Socrata files from s3.amazon.com and load them into the db"
   task :load_socrata => :environment  do |t, args|
-    properties = ImportHelpers.download_json_convert_to_hash('https://data.nola.gov/api/views/abvi-rghr/rows.json?accessType=DOWNLOAD')
+    properties = ImportHelpers.download_json_convert_to_hash('https://data.nola.gov/api/views/ifa2-i44v/rows.json?accessType=DOWNLOAD')
     exceptions = []
     properties[:data].each do |row|
       begin
-        house_num = row[11].split(' ')[0]
-        Demolition.find_or_create_by_address_long_and_date_completed(:house_num => house_num, :street_name => row[11].sub(house_num + ' ', '').upcase, :address_long =>  row[11], :date_completed => row[14], :program_name => row[8])
+        address_long = row[12] ? row[12] : row[13]
+        next if address_long.nil?
+        date_completed = row[15]
+        program = row[9]
+        house_num = address_long.split(' ')[0]
+        
+        d = Demolition.find_or_create_by_address_long_and_date_completed(:house_num => house_num, :street_name => address_long.sub(house_num + ' ', '').upcase, :address_long =>  address_long, :date_completed => date_completed, :program_name => program)
+        d.update_attribute(:date_completed, date_completed) if d && d.date_completed.nil? && date_completed
       rescue
         #these exceptions are for properties that are missing most data, except for address, date demolished, and program (they are all NORA). What do we want to do with them?
         exceptions.push({ :exception => $!, :row => row })
@@ -136,7 +142,7 @@ namespace :demolitions do
     if exceptions.length
       puts "There are #{exceptions.length} import errors"
       exceptions.each do |e|
-        puts " OBJECT ID: #{e[:row][2]}, ERROR: #{e[:exception]}"
+        puts " OBJECT ID: #{e[:row][0]}, ERROR: #{e[:exception]}"
       end
     end
   end
