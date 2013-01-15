@@ -56,8 +56,8 @@ describe Address do
     context "associated workflow steps" do
       before do
         c = FactoryGirl.create(:case, :address => @address)
-        @inspection = FactoryGirl.create(:inspection, :case => c)
-        @demo = FactoryGirl.create(:demolition, :address => @address, :date_started => Time.now)
+        @inspection = FactoryGirl.create(:inspection, :case => c, :inspection_date => (Time.now - 1.month))
+        @demo = FactoryGirl.create(:demolition, :address => @address, :date_started => (Time.now - 1.day), :date_completed => Time.now)
       end
 
       it "returns the last step from both cases and abatement" do
@@ -123,7 +123,7 @@ describe Address do
   describe "#most_recent_status_preview" do
     it "displays the most recent status class and time" do
       dt = DateTime.now - (1.day + 10.hours) #TODO adjust for timezone. should detect timezone
-      FactoryGirl.create(:demolition, :address => @address, :date_started => dt)
+      FactoryGirl.create(:demolition, :address => @address, :date_started => dt, :date_completed => dt)
       FactoryGirl.create(:maintenance, :address => @address, :date_completed => (DateTime.now - 2.days))
       FactoryGirl.create(:foreclosure, :address => @address, :sale_date => (DateTime.now - 3.days))
 

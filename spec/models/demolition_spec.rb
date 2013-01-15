@@ -44,7 +44,7 @@ describe Demolition do
   describe "#date -> date_started" do
    it "should return date_started of demoliton as date" do
    		dt = DateTime.now - 2.days
-      d = FactoryGirl.build(:demolition, :date_started => dt)
+      d = FactoryGirl.build(:demolition, :date_completed => dt)
       result = d.date
       result.should == dt
     end
@@ -61,7 +61,7 @@ describe Demolition do
 
   describe "#date -> date_created" do
    it "should return DateTime.new(0)  of demolition as date" do
-      d = FactoryGirl.build(:demolition)
+      d = FactoryGirl.build(:demolition, :date_started => nil, :date_completed => nil)
       result = d.date
       result.should == DateTime.new(0)
     end

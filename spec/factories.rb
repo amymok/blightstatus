@@ -20,6 +20,8 @@ FactoryGirl.define do
 
   factory :demolition do
     demo_number         {"DEMO-" + rand(1000).to_s()}
+    date_completed      { DateTime.new(rand(1000))}
+    date_started        { DateTime.new(rand(1000))}
     #date_started      {Time.now - 2.days}
     #date_completed    {Time.now - 1.days}
   end
