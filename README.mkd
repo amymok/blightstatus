@@ -73,7 +73,6 @@ implementations:
 * Ruby 1.9.2
 * Ruby 1.9.3
 
-
 ## <a name="copyright"></a>Copyright
 Copyright (c) 2012 Code for America. See [LICENSE][] for details.
 
