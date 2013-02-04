@@ -120,19 +120,42 @@ namespace :demolitions do
   end
 
   desc "Downloading Socrata files from s3.amazon.com and load them into the db"
-  task :load_socrata => :environment  do |t, args|
-    properties = ImportHelpers.download_json_convert_to_hash('https://data.nola.gov/api/views/ifa2-i44v/rows.json?accessType=DOWNLOAD')
+  task :load_socrata, [:socrata_id] => :environment  do |t, args|
+
+    socrata_id = args.socrata_id
+    
+    unless socrata_id
+      puts "Error: A Socrata dataset id is required"
+      return
+    end
+    properties = ImportHelpers.download_json_convert_to_hash("https://data.nola.gov/api/views/#{socrata_id}/rows.json?accessType=DOWNLOAD")
     exceptions = []
     properties[:data].each do |row|
       begin
-        address_long = row[12] ? row[12] : row[13]
+        address_long = row[12] ? row[12] : row[11]
         next if address_long.nil?
+        date_started = row[14]
         date_completed = row[15]
-        program = row[9]
+        program_name = row[9]
         house_num = address_long.split(' ')[0]
         
-        d = Demolition.find_or_create_by_address_long_and_date_completed(:house_num => house_num, :street_name => address_long.sub(house_num + ' ', '').upcase, :address_long =>  address_long, :date_completed => date_completed, :program_name => program)
-        d.update_attribute(:date_completed, date_completed) if d && d.date_completed.nil? && date_completed
+        demos = Demolition.where(:address_long => address_long)#, :program_name => program, :date_started => date_started, :date_completed)
+        if demos.any?
+          demos.each do |demo|
+            next if demo.program_name && demo.program_name.upcase != program_name.upcase
+            
+            if program_name.nil?
+              demo.program_name = program_name
+            end #demo.program_name && demo.program_name.upcase == program_name.upcase
+            
+            demo.date_started = date_started unless demo.date_started
+            demo.date_completed = date_completed unless demo.date_completed
+            demo.save!
+          end
+        else
+          Demolition.create(:address_long => address_long, :program_name => program_name, :date_started => date_started, :date_completed => date_completed)  
+        end
+
       rescue
         #these exceptions are for properties that are missing most data, except for address, date demolished, and program (they are all NORA). What do we want to do with them?
         exceptions.push({ :exception => $!, :row => row })
