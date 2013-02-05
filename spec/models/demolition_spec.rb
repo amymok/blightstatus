@@ -21,8 +21,8 @@ describe Demolition do
   describe "#unmatched_count" do
    it "should return total # of demoltions assigned to an address" do
       FactoryGirl.create(:demolition, :address => @address)
-      FactoryGirl.create(:demolition)
-      FactoryGirl.create(:demolition)
+      FactoryGirl.create(:demolition, :address_long => '2 way St')
+      FactoryGirl.create(:demolition, :address_long => '1 way St')
 
       result = Demolition.unmatched_count
       result.should == 2
