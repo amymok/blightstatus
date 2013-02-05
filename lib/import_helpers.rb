@@ -76,4 +76,18 @@ module ImportHelpers
     JSON.parse(downloaded_geojson)
   end
 
+  def upload_to_aws(remote_file_name, local_file_name_path, bucket_name ="neworleansdata")
+    ImportHelpers.connect_to_aws
+    AWS::S3::S3Object.store(remote_file_name, 
+                        open("#{local_file_name_path}"), 
+                        bucket_name,
+                        :access => :public_read)
+  end
+  def save_file_to_local(file_name, text)
+    saved_file = File.new(@cache_directory + file_name, "wb")
+    saved_file.write(text)
+    saved_file.close
+    saved_file
+  end
+
 end

@@ -149,7 +149,7 @@ class Address < ActiveRecord::Base
       abatement.update_attribute(:case_number, nil) if abatement.case_number && abatement.address_id && abatement.address_id != abatement.case.address_id
       abatement.address
       
-      Case.match_abatement(abatement) if abatement.address
+      # Case.match_abatement(abatement) if abatement.address
     end    
   end
 

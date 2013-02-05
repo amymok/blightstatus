@@ -129,6 +129,9 @@ namespace :demolitions do
       return
     end
     properties = ImportHelpers.download_json_convert_to_hash("https://data.nola.gov/api/views/#{socrata_id}/rows.json?accessType=DOWNLOAD")
+    file = ImportHelpers.save_file_to_local("nola_demos/#{socrata_id}_#{DateTime.now.to_s}.json", "#{properties.inspect}")
+    ImportHelpers.upload_to_aws(file.path.split('/').last, file.path)#, bucket_name ="neworleansdata")
+    
     exceptions = []
     properties[:data].each do |row|
       begin
@@ -142,15 +145,30 @@ namespace :demolitions do
         demos = Demolition.where(:address_long => address_long)#, :program_name => program, :date_started => date_started, :date_completed)
         if demos.any?
           demos.each do |demo|
+            updated = false
             next if demo.program_name && demo.program_name.upcase != program_name.upcase
             
-            if program_name.nil?
-              demo.program_name = program_name
-            end #demo.program_name && demo.program_name.upcase == program_name.upcase
-            
-            demo.date_started = date_started unless demo.date_started
-            demo.date_completed = date_completed unless demo.date_completed
-            demo.save!
+             
+            if (demo.date_started && demo.date_started != date_started) || (demo.date_completed && demo.date_completed != date_completed)
+              Demolition.create(:address_long => address_long, :program_name => program_name, :date_started => date_started, :date_completed => date_completed)  
+              next
+            else
+              if demo.program_name.nil? && program_name
+                demo.program_name = program_name
+                updated = true
+               end #demo.program_name && demo.program_name.upcase == program_name.upcase
+           
+              if demo.date_started.nil? && date_started
+                demo.date_started = date_started# unless demo.date_started
+                updated = true
+              end
+
+              if demo.date_completed.nil? && date_completed
+                demo.date_completed = date_completed #unless demo.date_completed              
+                updated = true
+              end
+            end
+            demo.save! if updated
           end
         else
           Demolition.create(:address_long => address_long, :program_name => program_name, :date_started => date_started, :date_completed => date_completed)  
@@ -188,6 +206,23 @@ namespace :demolitions do
     puts "There were #{success} successful address matches and #{failure} failed address matches and #{case_matches} cases matched"      
   end
 
+  desc "Correlate demolitions data with addresses"  
+  task :match_address => :environment  do |t, args|
+    # go through each foreclosure
+    success = 0
+    failure = 0
+    case_matches = 0
+    Demolition.where('address_id is null').each do |demolition|
+      if Address.match_abatement(demolition)
+        success +=1
+      else
+        puts "#{demolition.address_long} address not found in address table"
+        failure += 1
+      end
+    end
+    puts "There were #{success} successful address matches and #{failure} failed address matches"      
+  end
+
   desc "Correlate demolition data with cases"  
   task :match_case => :environment  do |t, args|
     # go through each demolition
@@ -200,5 +235,11 @@ namespace :demolitions do
   desc "Delete all demolitions from database"
   task :drop => :environment  do |t, args|
     Demolition.destroy_all
+  end
+
+  desc "Delete all demolitions from database"
+  task :save_test => :environment  do |t, args|
+    file = ImportHelpers.save_file_to_local("test1_#{DateTime.now.to_s}.txt", 'blahblahblah')
+    puts file.inspect
   end
 end
