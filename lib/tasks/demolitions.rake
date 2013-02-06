@@ -129,9 +129,17 @@ namespace :demolitions do
       return
     end
     properties = ImportHelpers.download_json_convert_to_hash("https://data.nola.gov/api/views/#{socrata_id}/rows.json?accessType=DOWNLOAD")
-    file = ImportHelpers.save_file_to_local("nola_demos/#{socrata_id}_#{DateTime.now.to_s}.json", "#{properties.inspect}")
-    ImportHelpers.upload_to_aws(file.path.split('/').last, file.path)#, bucket_name ="neworleansdata")
     
+    begin
+      basename = "#{socrata_id}_#{DateTime.now.to_s}"
+      file = Tempfile.new(basename)
+      file.write("#{properties.inspect}")
+      ImportHelpers.upload_to_aws("#{basename}.json", file.path)
+    ensure
+      file.close
+      file.unlink   # deletes the temp file
+    end
+
     exceptions = []
     properties[:data].each do |row|
       begin
