@@ -74,17 +74,28 @@ namespace :foreclosures do
     puts "There were #{success} successful address matches and #{failure} failed address matches and #{case_matches} cases matched"      
   end
 
-  # desc "Correlate foreclosure data with cases"  
-  # task :match_case => :environment  do |t, args|
-  #   # go through each demolition
-  #   foreclosures = Foreclosure.where("address_id is not null and case_number is null")
-  #   foreclosures.each do |foreclosure|
-  #     Case.match_abatement(foreclosure)
-  #   end
-  # end
+  desc "Correlate foreclosure data with addresses"  
+  task :match_address => :environment  do |t, args|
+    # go through each foreclosure
+    success = 0
+    failure = 0
+    case_matches = 0
+    Foreclosure.where('address_id is null').find_each do |foreclosure|
+      if Address.match_abatement(foreclosure)
+        success +=1
+      else
+        puts "#{foreclosure.address_long} address not found in address table"
+        failure += 1
+      end
+    end
+    puts "There were #{success} successful address matches and #{failure} failed address matches and #{case_matches} cases matched"      
+  end
 
-  # desc "Delete all foreclosures from database"
-  # task :drop => :environment  do |t, args|
-  #   Foreclosure.destroy_all
-  # end
+  desc "Downloading CDC case numbers from s3.amazon.com"  
+  task :load_foreclosures_by_date, [:start_dt, :end_dt] => :environment  do |t, args|
+    args.with_defaults(:start_dt => Foreclosure.where("status <> 'Pending'").maximum(:updated_at).utc.strftime('%m/%d/%Y'), :end_dt => DateTime.now.strftime('%m/%d/%Y'))
+    p args
+    client = Savon.client ENV['SHERIFF_WSDL']
+    ForeclosureHelpers.load_foreclosures_by_date(args.start_dt, args.end_dt, client)
+  end
 end

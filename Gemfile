@@ -16,7 +16,7 @@ gem 'devise'
 gem 'devise-async'
 
 gem 'lama', :git => 'https://github.com/gangleton/lama.git'
-gem 'savon'
+gem 'savon', "~> 1.2"
 gem 'httpclient', "~> 2.3.0"
 # gem 'mechanize'
 
