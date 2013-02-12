@@ -26,13 +26,10 @@
 
       -address.foreclosures.each do |d|
         %li
-          This property foreclosed on by the city
-          -unless d.sale_date.nil?
-            =on =d.sale_date.strftime("%-m/%-d/%y")
-          -unless d.notes.nil?
-            the latest status was a 
-            =d.notes
-
+          -if d.sale_date
+            This property #{d.sale_date > DateTime.now ? 'is':'was'} scheduled for <b>sheriff sale</b> on <b>#{d.sale_date.strftime("%-m/%-d/%y")}</b>
+            -if d.sale_date < DateTime.now && d.updated_at > d.sale_date && d.status
+              with an outcome of <b>#{d.status}</b>
 
       -address.maintenances.each do |d|
         %li
