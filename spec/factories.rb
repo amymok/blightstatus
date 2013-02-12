@@ -28,6 +28,7 @@ FactoryGirl.define do
 
   factory :foreclosure do
     sale_date {DateTime.now - 2.days}
+    cdc_case_number {"CDC-" + rand(1000).to_s()}
   end
 
   factory :hearing do
