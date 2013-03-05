@@ -1,4 +1,12 @@
 GIT
+  remote: git://github.com/rest-client/rest-client.git
+  revision: 2a32c7b3db297132afc03794dbdafe1fccaf1bd4
+  specs:
+    rest-client (1.6.7)
+      mime-types (>= 1.16)
+      netrc
+
+GIT
   remote: https://github.com/gangleton/lama.git
   revision: 2fdbc2ab67fed340bb334e21ec81772ee184a806
   specs:
@@ -156,6 +164,7 @@ GEM
     multi_json (1.5.0)
     multi_xml (0.5.1)
     multipart-post (1.1.5)
+    netrc (0.7.7)
     newrelic_rpm (3.5.3.25)
     nokogiri (1.5.5)
     nori (1.1.4)
@@ -198,6 +207,7 @@ GEM
       hashie (~> 1.2.0)
     rdoc (3.12)
       json (~> 1.4)
+    redirect_follower (0.1.1)
     rgeo (0.3.20)
     rgeo-activerecord (0.4.6)
       activerecord (>= 3.0.3)
@@ -317,6 +327,8 @@ DEPENDENCIES
   rails (~> 3.2)
   rails3-jquery-autocomplete
   rake
+  redirect_follower
+  rest-client!
   rgeo
   rgeo-geojson
   rgeo-shapefile
