@@ -31,6 +31,7 @@ module LAMAHelpers
         
         puts "case => #{case_number}   status => #{incident.CurrentStatus}    date => #{incident.CurrentStatusDate}"
         orig_state = kase.state
+        kase.state = case_state
         orig_outcome = kase.outcome
         incident_full = l.incident(case_number)
         
