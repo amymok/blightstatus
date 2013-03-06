@@ -12,7 +12,7 @@ gem 'aws-s3'
 gem 'roo' #excel parser
 gem 'docsplit'
 gem 'rubyXL'
-gem 'devise'
+gem 'devise', '~> 2.1.3'
 gem 'devise-async'
 
 gem 'lama', :git => 'https://github.com/gangleton/lama.git'
@@ -38,7 +38,7 @@ gem 'thin'
 
 gem 'newrelic_rpm', '3.5.3.25'
 
-gem 'debugger', '1.2.2'
+#gem 'debugger', '1.2.2'
 
 # Gems used only for assets and not required
 # in production environments by default.
