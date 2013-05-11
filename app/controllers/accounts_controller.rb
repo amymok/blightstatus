@@ -4,7 +4,7 @@ class AccountsController < ApplicationController
 
   def index
     @account = current_account
-    @account_subcriptions = @account.addresses
+    @account_subcriptions = @account.addresses.page(params[:page]).per(20)
 
     respond_to do |format|
       format.html

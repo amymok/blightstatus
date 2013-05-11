@@ -20,7 +20,7 @@
             =image_tag 'watchlist-sample.png'
           %p
             Click it, and that property will be instantly added to your Watchlist.
-
+        = paginate @account_subcriptions
         -@account_subcriptions.each do |address|
           .subscription{:id => "subscription-#{address.id}" }
 
@@ -59,6 +59,7 @@
               =link_to('Remove', "/subscriptions/#{address.id}", :remote => true, :method => :delete, 'data-type' => 'json', :class => 'btn btn-primary btn-tight subscribe-button' , :id => "subscribe-button")
 
           .clearfix
+        = paginate @account_subcriptions
   .row.span3
     .map#map{:style => "width: 300px; height: 200px"}
     .email-notification
