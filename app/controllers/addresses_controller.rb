@@ -21,13 +21,8 @@ class AddressesController < ApplicationController
     end
     
     @address = Address.find(params[:id])
-    @address.load_open_cases
+    # @address.load_open_cases
 
-    # if APP_CONFIG['demo_page_id'] == @address.id
-    #   render :action => 'show-demo'
-    # else
-      #respond_with(@address, @account_subscribed)
-    # end
     respond_to do |format|
         format.html
         format.json { render :json => {:address => @address, :account => @account}}
@@ -105,8 +100,6 @@ class AddressesController < ApplicationController
           sql_params[:status_type] = "Foreclosure"
         when 'demolitions'
           sql_params[:status_type] = "Demolition"
-        # when 'abatement'
-        #   sql_params[:status_type] = "Maintenance"
       end
     end
 
@@ -132,9 +125,7 @@ class AddressesController < ApplicationController
         case_addresses = Address.includes(:foreclosures).where(" foreclosures.sale_date > :start_date  AND foreclosures.sale_date <  :end_date  " ,  sql_params )
       when "demolitions"
         case_addresses = Address.includes(:demolitions).where(" demolitions.date_completed > :start_date AND demolitions.date_completed < :end_date  ",   sql_params)
-      # when 'abatement'
-      #   cases = Case.includes(:address, :maintenances).where(" cases.address_id = addresses.id  AND  date_completed > :start_date   AND date_completed < :end_date  #{append_sql_query}",   sql_params)
-    end
+      end
 
 
     # TODO: REWRITE FRONTEND SO IT CAN HANDLE RETURNED ARRAY OF ADDRESSES
@@ -171,8 +162,6 @@ class AddressesController < ApplicationController
 
 
   def redirect_latlong
-    # factory = RGeo::Cartesian.factory
-    # location = factory.point(params[:x].to_f, params[:y].to_f)
     @address = Address.where(" point = ST_GeomFromText('POINT(#{params[:x].to_f} #{params[:y].to_f})') " ).first
     redirect_to address_url(@address), :status => :found
   end
