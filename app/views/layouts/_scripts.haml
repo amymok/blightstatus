@@ -1,16 +1,3 @@
-:javascript
-  var _kmq = _kmq || [];
-  var _kmk = _kmk || '0136ff37ea63b8ea98fd6b94054bee3a4ced872a';
-  function _kms(u){
-    setTimeout(function(){
-      var d = document, f = d.getElementsByTagName('script')[0],
-      s = d.createElement('script');
-      s.type = 'text/javascript'; s.async = true; s.src = u;
-      f.parentNode.insertBefore(s, f);
-    }, 1);
-  }
-  _kms('//i.kissmetrics.com/i.js');
-  _kms('//doug1izaerwt3.cloudfront.net/' + _kmk + '.1.js');
 %script{:type => "text/javascript"}
   = yield :javascripts
 = javascript_include_tag "application"
@@ -18,10 +5,17 @@
 
 :javascript
   var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-18797759-9']);
-  _gaq.push(['_setDomainName', 'nola.gov']);
-  _gaq.push(['_setAllowLinker', true]);
-  _gaq.push(['_trackPageview']);
+  _gaq.push(['neworleans._setAccount', 'UA-18797759-9']);
+  _gaq.push(['neworleans._setDomainName', 'nola.gov']);
+  _gaq.push(['neworleans._setAllowLinker', true]);
+  _gaq.push(['neworleans._trackPageview']);
+
+
+  _gaq.push(['civicinsight._setAccount', 'UA-42090601-1']);
+  _gaq.push(['civicinsight._setDomainName', 'nola.gov']);
+  _gaq.push(['civicinsight._setAllowLinker', true]);
+  _gaq.push(['civicinsight._trackPageview']);
+
 
   (function() {
     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
