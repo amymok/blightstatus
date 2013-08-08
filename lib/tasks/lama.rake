@@ -307,4 +307,19 @@ namespace :lama do
       i+=1
     end 
   end
+
+  desc "reload cases imported without spawn"
+  task :load_open_cases_like, [:case_number_like] => :environment do |t, args|
+    where = "state = 'Open' and case_number like '#{args.case_number_like}'"
+    l = LAMA.new({:login => ENV['LAMA_EMAIL'], :pass => ENV['LAMA_PASSWORD']})
+    total = Case.where(where).count
+    puts "#{total.to_s} Open Cases as of #{DateTime.now}"
+    i = 1
+    Case.where(where).order('filed asc').find_each do |kase|
+      puts "#{i.to_s} of #{total.to_s}: #{kase.case_number} loading attempted at #{DateTime.now}"
+      LAMAHelpers.load_case(kase.case_number,l)
+      puts "#{i.to_s} of #{total.to_s}: #{kase.case_number} loaded"
+      i+=1
+    end 
+  end
 end
