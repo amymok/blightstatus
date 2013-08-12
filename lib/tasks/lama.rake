@@ -322,4 +322,38 @@ namespace :lama do
       i+=1
     end 
   end
+
+desc "reload cases imported without spawn"
+  task :load_open_cases_thread, [:batch_size] => :environment do |t, args|
+    args.with_defaults(:batch_size => 24*60)
+    batch_size = args.batch_size.to_i
+    l = LAMA.new({:login => ENV['LAMA_EMAIL'], :pass => ENV['LAMA_PASSWORD']})
+    
+    open_cases_count = Case.where(:state => 'Open').count
+    num_threads = (open_cases_count.to_f / batch_size.to_f).ceil
+
+    puts "#{open_cases_count.to_s} Open Cases as of #{DateTime.now}"
+
+    threads = []
+    
+    for i in 0..num_threads-1
+     puts "Thread => #{i}"
+
+     threads << Thread.new do
+
+        Thread.current[:index] = i
+        puts "start => #{Thread.current[:index]*batch_size}     batch_size => #{batch_size}"
+        k=1
+       Case.where(:state => 'Open').order("case_number").find_in_batches(start: (Thread.current[:index] * batch_size), batch_size: batch_size) do |group|
+          group.each do |kase|
+            puts "Thread => #{Thread.current[:index]}     #{k} of #{batch_size}      case_number => #{kase.case_number}"
+            LAMAHelpers.load_case(kase.case_number,l)
+            k+=1
+          end
+       end
+     end
+     sleep(60)
+    end
+    threads.each(&:join)
+  end
 end
