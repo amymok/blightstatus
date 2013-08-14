@@ -323,7 +323,7 @@ namespace :lama do
     end 
   end
 
-desc "reload cases imported without spawn"
+  desc "reload cases imported without spawn"
   task :load_open_cases_thread, [:batch_size] => :environment do |t, args|
     args.with_defaults(:batch_size => 24*60)
     batch_size = args.batch_size.to_i
@@ -336,24 +336,21 @@ desc "reload cases imported without spawn"
 
     threads = []
     
-    for i in 0..num_threads-1
-     puts "Thread => #{i}"
-
-     threads << Thread.new do
-
-        Thread.current[:index] = i
-        puts "start => #{Thread.current[:index]*batch_size}     batch_size => #{batch_size}"
-        k=1
-       Case.where(:state => 'Open').order("case_number").find_in_batches(start: (Thread.current[:index] * batch_size), batch_size: batch_size) do |group|
-          group.each do |kase|
-            puts "Thread => #{Thread.current[:index]}     #{k} of #{batch_size}      case_number => #{kase.case_number}"
+    i=0
+      Case.where(:state => 'Open').order("case_number").find_in_batches(batch_size: batch_size) do |group|
+        threads << Thread.new do
+          Thread.current[:group] = group
+          Thread.current[:index] = i
+          Thread.current[:batch_size] = group.size
+          Thread.current[:case_counter] = 1
+          Thread.current[:group].each do |kase|
+            puts "Thread => #{Thread.current[:index]}     #{Thread.current[:case_counter]} of #{Thread.current[:batch_size]}      case_number => #{kase.case_number}"
             LAMAHelpers.load_case(kase.case_number,l)
-            k+=1
+            Thread.current[:case_counter] += 1
           end
-       end
-     end
-     sleep(60)
-    end
+        end
+        i+=1
+      end
     threads.each(&:join)
   end
 end
