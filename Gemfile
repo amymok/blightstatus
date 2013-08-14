@@ -15,7 +15,8 @@ gem 'redirect_follower'
 gem "rest-client", :git => 'git://github.com/rest-client/rest-client.git'
 
 
-gem 'lama', :git => 'https://github.com/gangleton/lama.git'
+gem 'lama', :git => 'https://github.com/civicindustries/lama.git'
+# gem 'lama', :path => '../lama'
 gem 'savon', "~> 1.2"
 gem 'httpclient', "~> 2.3.0"
 # gem 'mechanize'
