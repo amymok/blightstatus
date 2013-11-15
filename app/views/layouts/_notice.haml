@@ -1,16 +1,14 @@
-#warning.row.full-width
-  %b Warning: 
-  the data on this site is currently incomplete! 
-  %a.learn-more{:href=>"#data-notice", :role=>"button" , "data-toggle"=>"modal"} Learn More &raquo;
+#data-notice.modal.hide.fade{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
+  .modal-header
+    %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
+    %h3#myModalLabel Warning
+  .modal-body
+    %p The City’s internal land management system is sending new information to BlightStatus more slowly than normal. As a result, some of the most recent case activity may not be available in BlightStatus.
 
-  #data-notice.modal.hide.fade.modal{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
-    .modal-header
-      %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
-      %h3#myModalLabel Warning
-    .modal-body
-      %p Right now, only 10% of the existing data about blight in New Orleans is loaded into this site, which is enough to show you how the site works, but won't give you a complete view of the City's current data. We will be loading the rest of the City's official data into this site in the coming weeks, so stay tuned, but feel free to try it out  in the meantime. 
+    %p The data feed will be improved in a few weeks, and we sincerely apologize for any inconvenience this may have caused in the interim.
+  
 
-    .modal-footer
-      %a.btn.btn-primary{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} I Understand
+  .modal-footer
+    %a.btn.btn-primary{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} I Understand
 
-      / %button.btn.btn-primary.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} I Understand
+    / %button.btn.btn-primary.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} I Understand

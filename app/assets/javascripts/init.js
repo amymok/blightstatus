@@ -5,6 +5,9 @@ OpenBlight = {
       // OpenBlight.common.show_disclaimer();
       OpenBlight.common.handle_auto_complete_address();
       OpenBlight.common.dropdownLoginForm();
+      OpenBlight.common.show_data_warning();
+
+
 
       if(!Array.prototype.last) {
         Array.prototype.last = function() {
@@ -58,6 +61,18 @@ OpenBlight = {
             source: "/addresses/autocomplete_address_address_long"
           });
         }
+      });
+    },
+
+
+    show_data_warning: function(){
+      if($.cookie('data-notice') !== 'true'){
+        $('#data-notice').modal('show');
+      } else {
+        $('#data-notice').modal('hide');
+      }
+      $('#data-notice .btn-primary').click(function(){
+        $.cookie('data-notice', 'true');
       });
     },
 
